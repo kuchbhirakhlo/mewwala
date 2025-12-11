@@ -341,7 +341,7 @@ export default function QRCodesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {menus.map((menu) => (
-                    <SelectItem key={menu.id} value={menu.id}>
+                    <SelectItem key={menu.name} value={menu.name}>
                   {menu.name} ({menu.viewCount} views)
                     </SelectItem>
                   ))}

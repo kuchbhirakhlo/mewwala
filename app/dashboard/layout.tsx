@@ -55,18 +55,16 @@ export default function DashboardLayout({
         <div className="md:hidden flex h-16 items-center border-b bg-white shadow-sm">
           <div className="w-14"></div> {/* Space reserved for menu button */}
           <div className="flex-1 flex justify-center items-center">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/dashboard" className="flex items-center">
             <Image 
               src="/logo.png" 
               alt="Make Your Menu Logo" 
               width={40} 
               height={40} 
-              className="h-14 w-auto rounded-2xl"
+              className="h-[6rem] w-auto rounded-2xl"
             />
-              <span className="font-semibold text-orange-600">MakeYourMenu</span>
             </Link>
           </div>
-          <div className="w-14"></div> {/* Balanced space on right */}
         </div>
         
         {/* Page content */}
