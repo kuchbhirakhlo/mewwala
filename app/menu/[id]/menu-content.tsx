@@ -304,7 +304,7 @@ export function MenuContent({ id }: { id: string }) {
                   
                   <div className="flex items-center gap-2 text-gray-600 mb-3">
                     <Phone className="h-4 w-4" />
-                    <span className="text-sm font-medium">+91 98765 43210</span>
+                    <span className="text-sm font-medium">+{menu.whatsappNumber}</span>
                   </div>
                   
                   {/* Status */}
