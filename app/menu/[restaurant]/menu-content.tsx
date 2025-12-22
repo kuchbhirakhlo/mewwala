@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { doc, safeGetDoc, setDoc } from "@/lib/firebase"
+import { doc, safeGetDoc, setDoc, query, where, getDocs, collection } from "@/lib/firebase"
 import { db } from "@/lib/firebase"
 import { updateDoc, increment, serverTimestamp } from "firebase/firestore"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,7 +31,7 @@ interface Menu {
   whatsappNumber?: string
 }
 
-export function MenuContent({ id }: { id: string }) {
+export function MenuContent({ restaurant }: { restaurant: string }) {
   const [menu, setMenu] = useState<Menu | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,11 +45,15 @@ export function MenuContent({ id }: { id: string }) {
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length === 0 || !menu?.whatsappNumber) return;
     setPlacingOrder(true);
+    
+    // Calculate total amount at the time of order
+    const currentTotal = Object.values(cart).reduce((sum, entry) => sum + entry.item.price * entry.quantity, 0);
+    
     let message = `🍽️ *New Order from: ${menu?.name || ''}*\n\n`;
     Object.values(cart).forEach((entry, idx) => {
       message += `${idx + 1}. ${entry.item.name} x${entry.quantity} - ₹${(entry.item.price * entry.quantity).toFixed(2)}\n`;
     });
-    message += `\n💰 *Total: ₹${totalAmount.toFixed(2)}*\n\nThank you for choosing us! 🙏`;
+    message += `\n💰 *Total: ₹${currentTotal.toFixed(2)}*\n\nThank you for choosing us! 🙏`;
     setTimeout(() => {
       setPlacingOrder(false);
       const url = `https://wa.me/${menu.whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -130,19 +134,38 @@ export function MenuContent({ id }: { id: string }) {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const menuDocRef = doc(db, "menus", id);
-        const menuDoc = await safeGetDoc(menuDocRef);
-
-        if (!menuDoc.exists()) {
-          setError("Menu not found")
-          return
+        // Convert restaurant parameter back to search format
+        // The QR code converts spaces to hyphens and makes it lowercase
+        // So we need to reverse this process
+        const searchTerm = restaurant.replace(/-/g, ' ').toLowerCase();
+        
+        // Get all menus and find the matching one
+        const querySnapshot = await getDocs(collection(db, "menus"));
+        
+        let matchingMenuDoc = null;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const menuName = (data.name || '').toLowerCase();
+          const restaurantName = (data.restaurantName || data.name || '').toLowerCase();
+          
+          // Check if either name matches our search term
+          if (menuName === searchTerm || restaurantName === searchTerm) {
+            matchingMenuDoc = { id: doc.id, data };
+          }
+        });
+        
+        if (!matchingMenuDoc) {
+          setError("Menu not found");
+          return;
         }
-
-        const menuData = menuDoc.data() as Menu;
+        
+        // Type assertion to tell TypeScript that matchingMenuDoc is not null here
+        const menuDoc = matchingMenuDoc as { id: string; data: Menu };
+        const menuData = menuDoc.data;
         setMenu(menuData);
-
+        
         try {
-          await updateDoc(menuDocRef, {
+          await updateDoc(doc(db, "menus", menuDoc.id), {
             viewCount: increment(1),
             lastViewed: serverTimestamp()
           });
@@ -150,13 +173,13 @@ export function MenuContent({ id }: { id: string }) {
           const deviceInfo = getDeviceInfo();
           const referrerInfo = document.referrer || 'direct';
           const screenSize = `${window.innerWidth}x${window.innerHeight}`;
-          const uniqueViewId = `${id}_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+          const uniqueViewId = `${menuDoc.id}_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
 
           const viewsRef = doc(db, "menu_views", uniqueViewId);
           await setDoc(viewsRef, {
-            menuId: id,
+            menuId: menuDoc.id,
             timestamp: serverTimestamp(),
-            restaurantId: menuData.restaurantId,
+            restaurantId: menuData.restaurantId || 'unknown',
             userAgent: navigator.userAgent,
             deviceType: deviceInfo.deviceType,
             deviceVendor: deviceInfo.vendor,
@@ -179,7 +202,7 @@ export function MenuContent({ id }: { id: string }) {
     }
 
     fetchMenu()
-  }, [id])
+  }, [restaurant])
 
   const getDeviceInfo = () => {
     const ua = navigator.userAgent;
@@ -248,7 +271,7 @@ export function MenuContent({ id }: { id: string }) {
             <div className="h-12 w-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto md:h-16 md:w-16"></div>
             <Pizza className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-4 w-4 text-orange-500 md:h-6 md:w-6" />
           </div>
-          <p className="mt-3 text-orange-700 font-medium text-sm md:text-base">Loading delicious menu...</p>
+          <p className="mt-3 text-orange-700 font-medium text-sm md:text-base">Loading  menu...</p>
         </div>
       </div>
     )
@@ -262,8 +285,18 @@ export function MenuContent({ id }: { id: string }) {
             <div className="mx-auto mb-3 h-12 w-12 bg-red-100 rounded-full flex items-center justify-center md:mb-4 md:h-16 md:w-16">
               <QrCode className="h-6 w-6 text-red-500 md:h-8 md:w-8" />
             </div>
-            <CardTitle className="text-red-600 text-lg md:text-xl">Oops! Something went wrong</CardTitle>
-            <CardDescription className="text-gray-600 text-sm md:text-base">{error || "Unable to load menu. Please try again."}</CardDescription>
+            <CardTitle className="text-red-600 text-lg md:text-xl">Menu Not Found</CardTitle>
+            <CardDescription className="text-gray-600 text-sm md:text-base">
+              {error || "The requested menu could not be found. Please check the URL or try again later."}
+            </CardDescription>
+            <div className="mt-4">
+              <Link 
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Go Home
+              </Link>
+            </div>
           </CardHeader>
         </Card>
       </div>

@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "MakeYourMenu - QR Menu Generator",
+  title: "Menuwala - QR Menu Generator",
   description: "Create beautiful digital menus and QR codes for your Business",
   manifest: "/manifest.json",
     generator: 'v0.dev'

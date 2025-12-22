@@ -1,6 +1,6 @@
 {
-  "name": "MakeYourMenu - Restaurant Menu Generator",
-  "short_name": "MakeYourMenu",
+  "name": "MenuWala - Restaurant QR Menu Generator",
+  "short_name": "Menuwala",
   "description": "Create beautiful digital menus and QR codes for your restaurant",
   "start_url": "/",
   "display": "standalone",

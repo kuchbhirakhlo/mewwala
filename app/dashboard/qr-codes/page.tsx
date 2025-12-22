@@ -19,6 +19,9 @@ import { Separator } from "@/components/ui/separator"
 interface Menu {
   id: string
   name: string
+  restaurantName?: string
+  nameLower?: string
+  restaurantNameLower?: string
   viewCount?: number
 }
 
@@ -52,10 +55,17 @@ export default function QRCodesPage() {
 
         const menuList: Menu[] = []
         querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const nameLower = (data.name || '').toLowerCase();
+          const restaurantNameLower = (data.restaurantName || data.name || '').toLowerCase();
+          
           menuList.push({
             id: doc.id,
-            name: doc.data().name,
-            viewCount: doc.data().viewCount || 0,
+            name: data.name,
+            restaurantName: data.restaurantName || data.name,
+            viewCount: data.viewCount || 0,
+            nameLower,
+            restaurantNameLower
           })
         })
 
@@ -169,7 +179,29 @@ export default function QRCodesPage() {
 
   const generateQRCode = async (menuId: string) => {
     try {
-      const menuUrl = `${window.location.origin}/menu/${menuId}`
+      // Find the menu object to get restaurantName
+      const menuObj = menus.find(menu => menu.id === menuId);
+      if (!menuObj) {
+        throw new Error('Menu not found');
+      }
+      
+      const restaurantName = menuObj.restaurantName || menuObj.name;
+      
+      // Check for duplicate restaurant names
+      const duplicateNames = menus.filter(menu => 
+        (menu.restaurantName || menu.name).toLowerCase() === restaurantName.toLowerCase() && 
+        menu.id !== menuId
+      );
+      
+      if (duplicateNames.length > 0) {
+        toast({
+          title: "Warning",
+          description: `Multiple menus found with the name "${restaurantName}". QR code may not work correctly.`,
+          variant: "destructive",
+        });
+      }
+      
+      const menuUrl = `${window.location.origin}/menu/${restaurantName.replace(/\s+/g, '-').toLowerCase()}`
 
       // Generate QR code as data URL with custom colors
       const dataUrl = await QRCode.toDataURL(menuUrl, {
@@ -310,7 +342,14 @@ export default function QRCodesPage() {
     try {
       if (!selectedMenu) return
 
-      const menuUrl = `${window.location.origin}/menu/${selectedMenu}`
+      // Find the menu object to get restaurantName
+      const menuObj = menus.find(menu => menu.id === selectedMenu);
+      if (!menuObj) {
+        throw new Error('Menu not found');
+      }
+      
+      const restaurantName = menuObj.restaurantName || menuObj.name;
+      const menuUrl = `${window.location.origin}/menu/${restaurantName.replace(/\s+/g, '-').toLowerCase()}`
 
       if (navigator.share) {
         await navigator.share({
@@ -340,11 +379,16 @@ export default function QRCodesPage() {
                   <SelectValue placeholder="Select a menu" />
                 </SelectTrigger>
                 <SelectContent>
-                  {menus.map((menu) => (
-                    <SelectItem key={menu.name} value={menu.name}>
-                  {menu.name} ({menu.viewCount} views)
-                    </SelectItem>
-                  ))}
+                  {menus.map((menu) => {
+                    const displayName = menu.restaurantName || menu.name;
+                    const isDuplicate = menus.filter(m => (m.restaurantName || m.name).toLowerCase() === displayName.toLowerCase()).length > 1;
+                    
+                    return (
+                      <SelectItem key={menu.id} value={menu.id}>
+                        {displayName} ({menu.viewCount} views){isDuplicate ? ` - ID: ${menu.id.substring(0, 8)}...` : ''}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
         </div>
