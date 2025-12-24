@@ -5,6 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import Script from "next/script"
 import { auth, safeOnAuthStateChanged } from "@/lib/firebase"
 import { Sidebar } from "@/components/sidebar"
 import { QrCode } from "lucide-react"
@@ -45,7 +46,14 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-orange-50">
+    <>
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8434537394521880"
+        crossOrigin="anonymous"
+        strategy="beforeInteractive"
+      />
+      <div className="flex min-h-screen bg-orange-50">
       {/* Desktop Sidebar */}
       <Sidebar />
       
@@ -72,6 +80,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
