@@ -5,7 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { auth, safeSignOut, safeOnAuthStateChanged } from "@/lib/firebase"
-import { LayoutDashboard, Utensils, QrCode, LogOut, Menu } from "lucide-react"
+import { LayoutDashboard, Utensils, QrCode, LogOut, Menu, ShoppingCart } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
 import { UserAvatar } from "@/components/user-avatar"
@@ -34,6 +34,8 @@ export function Sidebar() {
   const handleSignOut = async () => {
     try {
       await safeSignOut(auth)
+      // Clear session storage on sign out
+      sessionStorage.removeItem("userSession")
       toast({
         title: "Signed out",
         description: "You've been signed out successfully.",
@@ -64,6 +66,11 @@ export function Sidebar() {
       href: "/dashboard/qr-codes",
       label: "QR Codes",
       icon: <QrCode className="h-5 w-5" />,
+    },
+    {
+      href: "/dashboard/orders",
+      label: "Orders",
+      icon: <ShoppingCart className="h-5 w-5" />,
     },
   ]
 

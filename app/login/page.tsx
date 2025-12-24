@@ -21,6 +21,7 @@ import {
   safeSignInWithPopup,
   safeSetDoc,
   safeGetDoc,
+  safeOnAuthStateChanged,
   serverTimestamp,
 } from "@/lib/firebase"
 import { QrCode } from "lucide-react"
@@ -30,8 +31,25 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  // Check for Google auth result on component mount
+  // Check for existing authentication and Google auth result on component mount
   useEffect(() => {
+    // Check if user is already logged in
+    const unsubscribe = safeOnAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User already logged in, redirecting to dashboard")
+        // Save session data
+        sessionStorage.setItem("userSession", JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          loginTime: new Date().toISOString(),
+        }))
+        router.push("/dashboard")
+        return
+      }
+    })
+
+    // Check for Google auth result
     const storedAuthResult = sessionStorage.getItem("googleAuthResult")
     if (storedAuthResult) {
       const authResult = JSON.parse(storedAuthResult)
@@ -55,6 +73,14 @@ export default function LoginPage() {
             description: "You've successfully logged in with Google.",
           })
 
+          // Save session data
+          sessionStorage.setItem("userSession", JSON.stringify({
+            uid: authResult.user.uid,
+            email: authResult.user.email,
+            displayName: authResult.user.displayName,
+            loginTime: new Date().toISOString(),
+          }))
+
           // Clear the stored auth result
           sessionStorage.removeItem("googleAuthResult")
 
@@ -72,6 +98,8 @@ export default function LoginPage() {
 
       processGoogleAuth()
     }
+
+    return () => unsubscribe()
   }, [router])
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -91,6 +119,14 @@ export default function LoginPage() {
 
       const userCredential = await safeSignInWithEmailAndPassword(auth, email, password)
       console.log("Login successful")
+
+      // Save session data
+      sessionStorage.setItem("userSession", JSON.stringify({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        loginTime: new Date().toISOString(),
+      }))
 
       toast({
         title: "Success!",
@@ -169,6 +205,14 @@ export default function LoginPage() {
             },
         { merge: true }
           );
+
+          // Save session data
+          sessionStorage.setItem("userSession", JSON.stringify({
+            uid: result.user.uid,
+            email: result.user.email,
+            displayName: result.user.displayName,
+            loginTime: new Date().toISOString(),
+          }));
 
           toast({
             title: "Success!",

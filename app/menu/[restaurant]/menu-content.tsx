@@ -7,6 +7,9 @@ import { db } from "@/lib/firebase"
 import { updateDoc, increment, serverTimestamp } from "firebase/firestore"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Pizza, QrCode, Star, Clock, MapPin, Phone, Heart, ShoppingCart, Search, Filter, X } from "lucide-react"
 import React from "react"
 import Link from "next/link"
@@ -41,27 +44,67 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [customerMobile, setCustomerMobile] = useState("");
+  const [roomTableNumber, setRoomTableNumber] = useState("");
 
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length === 0 || !menu?.whatsappNumber) return;
+    setOrderDialogOpen(true);
+  };
+
+  const handleSubmitOrder = async () => {
+    if (!customerName || !customerMobile || !roomTableNumber || !menu) return;
     setPlacingOrder(true);
-    
+
     // Calculate total amount at the time of order
     const currentTotal = Object.values(cart).reduce((sum, entry) => sum + entry.item.price * entry.quantity, 0);
-    
+
     let message = `🍽️ *New Order from: ${menu?.name || ''}*\n\n`;
+    message += `👤 *Customer Name:* ${customerName}\n`;
+    message += `📱 *Mobile:* ${customerMobile}\n`;
+    message += `🏠 *Room/Table:* ${roomTableNumber}\n\n`;
     Object.values(cart).forEach((entry, idx) => {
       message += `${idx + 1}. ${entry.item.name} x${entry.quantity} - ₹${(entry.item.price * entry.quantity).toFixed(2)}\n`;
     });
     message += `\n💰 *Total: ₹${currentTotal.toFixed(2)}*\n\nThank you for choosing us! 🙏`;
+
+    // Save to Firestore
+    try {
+      await setDoc(doc(collection(db, "orders")), {
+        restaurantId: menu!.restaurantId,
+        customerName,
+        customerMobile,
+        roomTableNumber,
+        items: Object.values(cart).map(entry => ({ name: entry.item.name, quantity: entry.quantity, price: entry.item.price })),
+        total: currentTotal,
+        timestamp: serverTimestamp(),
+        status: 'pending'
+      });
+    } catch (error) {
+      console.error("Error saving order:", error);
+    }
+
     setTimeout(() => {
       setPlacingOrder(false);
-      const url = `https://wa.me/${menu.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      setOrderDialogOpen(false);
+      // Reset form
+      setCustomerName("");
+      setCustomerMobile("");
+      setRoomTableNumber("");
+      setCart({});
+      const url = `https://wa.me/${menu!.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }, 1200);
   };
 
   const handleAddToCart = (item: MenuItem) => {
+    const currentTotalItems = Object.values(cart).reduce((sum, entry) => sum + entry.quantity, 0);
+    if (currentTotalItems >= 4) {
+      alert("Maximum 4 items allowed per order");
+      return;
+    }
     setCart(prev => {
       const key = item.name;
       if (prev[key]) {
@@ -73,6 +116,11 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   };
 
   const handleIncrement = (item: MenuItem) => {
+    const currentTotalItems = Object.values(cart).reduce((sum, entry) => sum + entry.quantity, 0);
+    if (currentTotalItems >= 4) {
+      alert("Maximum 4 items allowed per order");
+      return;
+    }
     setCart(prev => {
       const key = item.name;
       if (prev[key]) {
@@ -547,8 +595,11 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                             {/* Add to Cart / Quantity Controls */}
                             {!cart[item.name] ? (
                               <button
-                                className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full font-bold text-xs shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 md:gap-2 md:px-6 md:py-3 md:text-lg"
+                                className={`flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full font-bold text-xs shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 md:gap-2 md:px-6 md:py-3 md:text-lg ${
+                                  totalItems >= 4 ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                                 onClick={() => handleAddToCart(item)}
+                                disabled={totalItems >= 4}
                               >
                                 <ShoppingCart className="h-3 w-3 md:h-5 md:w-5" />
                                 <span className="hidden sm:inline">Add to Cart</span>
@@ -574,9 +625,12 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                                 </div>
                                 
                                 <button
-                                  className="w-6 h-6 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 md:w-12 md:h-12 md:text-xl"
+                                  className={`w-6 h-6 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 md:w-12 md:h-12 md:text-xl ${
+                                    totalItems >= 4 ? 'opacity-50 cursor-not-allowed' : ''
+                                  }`}
                                   onClick={() => handleIncrement(item)}
                                   aria-label="Increase quantity"
+                                  disabled={totalItems >= 4}
                                 >
                                   +
                                 </button>
@@ -676,6 +730,72 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
           </div>
         </div>
       )}
+
+      {/* Order Dialog */}
+      <Dialog open={orderDialogOpen} onOpenChange={setOrderDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Place Your Order</DialogTitle>
+            <DialogDescription>
+              Please provide your details to complete the order.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Enter your name"
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="mobile" className="text-right">
+                Mobile
+              </Label>
+              <Input
+                id="mobile"
+                type="tel"
+                value={customerMobile}
+                onChange={(e) => setCustomerMobile(e.target.value)}
+                placeholder="Enter mobile number"
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="roomTable" className="text-right">
+                Room/Table
+              </Label>
+              <Input
+                id="roomTable"
+                value={roomTableNumber}
+                onChange={(e) => setRoomTableNumber(e.target.value)}
+                placeholder="Room or Table number"
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <button
+              onClick={() => setOrderDialogOpen(false)}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitOrder}
+              disabled={placingOrder || !customerName || !customerMobile || !roomTableNumber}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {placingOrder ? 'Placing Order...' : 'Place Order'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <div className="mt-12 pb-6 md:mt-10 md:pb-4">

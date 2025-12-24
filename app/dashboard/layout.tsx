@@ -61,7 +61,7 @@ export default function DashboardLayout({
               alt="Make Your Menu Logo" 
               width={40} 
               height={40} 
-              className="h-[6rem] w-auto rounded-2xl"
+              className="h-[12rem] w-auto rounded-2xl"
             />
             </Link>
           </div>

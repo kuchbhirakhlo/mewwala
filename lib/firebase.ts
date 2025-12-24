@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, createUserWithEmailAndPassword, onAuthStateChanged, signOut, browserLocalPersistence, setPersistence, type Auth, type User } from "firebase/auth"
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, serverTimestamp as firestoreServerTimestamp, type Firestore, connectFirestoreEmulator } from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy, updateDoc, serverTimestamp as firestoreServerTimestamp, type Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
 import { demoRestaurant, demoMenus } from "@/lib/demo-data"
 
@@ -82,8 +82,8 @@ export const db = firebaseDb;
 export const storage = firebaseStorage;
 
 // Export Firebase authentication methods
-export { 
-  GoogleAuthProvider, 
+export {
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
@@ -97,7 +97,9 @@ export {
   addDoc,
   getDocs,
   query,
-  where
+  where,
+  orderBy,
+  updateDoc
 };
 
 // Export Firestore server timestamp for consistent timestamps

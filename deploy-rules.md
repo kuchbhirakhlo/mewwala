@@ -47,6 +47,13 @@ service cloud.firestore {
     match /menu_views/{viewId} {
       allow create, read: if true;
     }
+
+    // Allow authenticated users to read orders for their restaurant, and anyone to create orders
+    match /orders/{orderId} {
+      allow create: if true; // Allow anyone to place orders
+      allow read, update, delete: if request.auth != null &&
+        (request.auth.uid == resource.data.restaurantId);
+    }
   }
 }
 ```
