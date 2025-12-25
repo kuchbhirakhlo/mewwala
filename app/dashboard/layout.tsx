@@ -66,7 +66,7 @@ export default function DashboardLayout({
             <Link href="/dashboard" className="flex items-center">
             <Image 
               src="/logo.png" 
-              alt="Make Your Menu Logo" 
+              alt="Menu Wala Logo" 
               width={40} 
               height={40} 
               className="h-[12rem] w-auto rounded-2xl"

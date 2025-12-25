@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,7 +42,7 @@ export default function QRCodesPage() {
   const [totalViews, setTotalViews] = useState(0)
   const [qrForeground, setQrForeground] = useState("#000000")
   const [qrBackground, setQrBackground] = useState("#ffffff")
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  // Removed canvasRef as it's no longer needed
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -214,18 +214,6 @@ export default function QRCodesPage() {
       })
 
       setQrCodeUrl(dataUrl)
-
-      // Also render to canvas for better quality download
-      if (canvasRef.current) {
-        await QRCode.toCanvas(canvasRef.current, menuUrl, {
-          width: 300,
-          margin: 2,
-          color: {
-            dark: qrForeground,
-            light: qrBackground,
-          },
-        })
-      }
     } catch (error) {
       console.error("Error generating QR code:", error)
       toast({
@@ -254,10 +242,10 @@ export default function QRCodesPage() {
     }
   }
 
-  const downloadQRCode = () => {
+  const downloadQRCode = async () => {
     try {
-      if (!canvasRef.current) {
-        console.error("Canvas ref is null");
+      if (!qrCodeUrl) {
+        console.error("QR code URL is null");
         toast({
           title: "Error",
           description: "Could not generate QR code image",
@@ -269,65 +257,73 @@ export default function QRCodesPage() {
       // Get selected menu name
       const selectedMenuObj = menus.find(menu => menu.id === selectedMenu);
       const businessName = selectedMenuObj ? selectedMenuObj.name : "Menu";
-      
+
       // Create a new canvas with space for text
       const newCanvas = document.createElement("canvas");
-      const qrWidth = canvasRef.current.width;
-      const qrHeight = canvasRef.current.height;
+      const qrWidth = 300; // QR code width
+      const qrHeight = 300; // QR code height
       const padding = 20;
       const shadowSize = 15;
-      
+
       // Set canvas size with extra space for text and shadow
       newCanvas.width = qrWidth + (padding * 2) + (shadowSize * 2);
       newCanvas.height = qrHeight + 100 + (shadowSize * 2);  // Add 100px for text area plus shadow
-      
+
       const ctx = newCanvas.getContext("2d");
       if (!ctx) {
         console.error("Could not get canvas context");
         return;
       }
-      
+
       // Fill background
       ctx.fillStyle = qrBackground;
       ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-      
+
       // Add orange shadow
       ctx.shadowColor = 'rgba(249, 115, 22, 0.5)'; // Orange shadow with 50% opacity
       ctx.shadowBlur = shadowSize;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
-      
+
       // Create white rectangle with shadow for QR code background
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(shadowSize, shadowSize, qrWidth + (padding * 2), qrHeight + padding);
-      
+
       // Reset shadow for the QR code and text
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
-      
+
+      // Load QR code image from data URL
+      const qrImage = new Image();
+      qrImage.src = qrCodeUrl;
+      await new Promise((resolve, reject) => {
+        qrImage.onload = resolve;
+        qrImage.onerror = reject;
+      });
+
       // Draw QR code (centered)
-      ctx.drawImage(canvasRef.current, padding + shadowSize, padding + shadowSize);
-      
+      ctx.drawImage(qrImage, padding + shadowSize, padding + shadowSize);
+
       // Add business name text
       ctx.fillStyle = qrForeground;
       ctx.font = "bold 20px Arial";
       ctx.textAlign = "center";
       ctx.fillText(businessName, newCanvas.width / 2, qrHeight + 50 + shadowSize);
-      
+
       // Add scan text
       ctx.font = "16px Arial";
       ctx.fillText("Scan to get the complete menu", newCanvas.width / 2, qrHeight + 80 + shadowSize);
-      
+
       // Create download link
       const link = document.createElement("a");
       link.download = `${businessName.replace(/\s+/g, '-').toLowerCase()}-menu-qr.png`;
-      
+
       // Get data URL and trigger download
       link.href = newCanvas.toDataURL("image/png");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
     } catch (error) {
       console.error("Error downloading QR code:", error);
       toast({
@@ -475,12 +471,11 @@ export default function QRCodesPage() {
           <CardContent className="flex justify-center">
             {qrCodeUrl ? (
               <div className="flex flex-col items-center">
-                <img 
-                  src={qrCodeUrl || "/placeholder.svg"} 
-                  alt="Menu QR Code" 
-                  className="border p-4 rounded-lg shadow-[0_0_15px_rgba(249,115,22,0.5)]" 
+                <img
+                  src={qrCodeUrl || "/placeholder.svg"}
+                  alt="Menu QR Code"
+                  className="border p-4 rounded-lg shadow-[0_0_15px_rgba(249,115,22,0.5)]"
                 />
-                <canvas ref={canvasRef} className="hidden" />
               </div>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">

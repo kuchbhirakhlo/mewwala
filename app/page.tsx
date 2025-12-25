@@ -34,7 +34,7 @@ export default function Home() {
           <div className="flex items-center gap-2 font-bold text-xl text-white">
             <Image
               src="/logo.png"
-              alt="Make Your Menu Logo"
+              alt="Menu Wala Logo"
               width={40}
               height={40}
               className="h-32 w-auto rounded-2xl"
@@ -117,10 +117,12 @@ export default function Home() {
                 <div className="absolute -top-8 -left-8 w-32 h-32 bg-yellow-400 rounded-full opacity-20 blur-2xl"></div>
                 <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-orange-400 rounded-full opacity-20 blur-2xl"></div>
                 <div className="relative z-10">
-                  <img
-                    src="https://images.unsplash.com/photo-1579684947550-22e945225d9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2574&q=80"
+                  <Image
+                    src="/image.png"
                     alt="Digital restaurant menu on mobile device"
                     className="rounded-2xl shadow-2xl w-full h-auto"
+                    width={600}
+                    height={800}
                   />
                   {/* Floating elements */}
                   <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-3">
@@ -233,7 +235,7 @@ export default function Home() {
                   </div>
                   <CardTitle className="text-red-600">Photo Gallery</CardTitle>
                   <CardDescription>
-                    Upload mouth-watering photos of your dishes to make your menu more appealing
+                    Upload mouth-watering photos of your dishes to Menu Wala  more appealing
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -574,7 +576,7 @@ export default function Home() {
               <div className="flex items-center gap-2 font-bold text-orange-600">
                 <Image
                   src="/logo.png"
-                  alt="Make Your Menu Logo"
+                  alt="Menu Wala Logo"
                   width={40}
                   height={40}
                   className="h-24 w-auto rounded-2xl"
