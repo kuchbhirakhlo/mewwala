@@ -9,10 +9,31 @@ interface MenuData {
   restaurantName?: string;
 }
 
-export function generateStaticParams() {
-  // For static export, we need to provide at least one param, but since menus are dynamic,
-  // we'll provide a placeholder that won't be used in production.
-  return [{ restaurant: 'placeholder' }];
+export async function generateStaticParams() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "menus"));
+    const params: { restaurant: string }[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as MenuData;
+      const names = [data.name, data.restaurantName].filter(Boolean);
+
+      names.forEach((name) => {
+        const slug = name!.replace(/\s+/g, '-').toLowerCase();
+        params.push({ restaurant: slug });
+      });
+    });
+
+    // Remove duplicates
+    const uniqueParams = params.filter((param, index, self) =>
+      index === self.findIndex(p => p.restaurant === param.restaurant)
+    );
+
+    return uniqueParams;
+  } catch (error) {
+    console.error("Error generating static params:", error);
+    return [];
+  }
 }
 
 // This is a Server Component that safely extracts params and passes them as props
