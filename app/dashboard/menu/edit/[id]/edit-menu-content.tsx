@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { PlusCircle, Trash2, Edit, ArrowLeft } from "lucide-react"
+import { PlusCircle, Trash2, Edit, ArrowLeft, Image } from "lucide-react"
 import { auth, db, doc, safeGetDoc, safeSetDoc, serverTimestamp } from "@/lib/firebase"
+import { uploadImage } from "@/lib/cloudinary"
 import Link from "next/link"
 import React from "react"
 
@@ -18,6 +19,7 @@ interface MenuItem {
   name: string
   description: string
   price: string
+  image?: string
 }
 
 interface Category {
@@ -36,6 +38,7 @@ interface MenuData {
       name: string
       description: string
       price: number
+      image?: string
     }[]
   }[]
   restaurantId: string
@@ -50,6 +53,7 @@ export function EditMenuContent({ id }: { id: string }) {
   const [whatsappNumber, setWhatsappNumber] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [uploadedImages, setUploadedImages] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -98,6 +102,7 @@ export function EditMenuContent({ id }: { id: string }) {
             name: item.name,
             description: item.description || "",
             price: item.price.toString(),
+            image: item.image || "",
           })),
         }))
 
@@ -149,6 +154,7 @@ export function EditMenuContent({ id }: { id: string }) {
                 name: "New Item",
                 description: "Description",
                 price: "0.00",
+                image: "",
               },
             ],
           }
@@ -183,6 +189,25 @@ export function EditMenuContent({ id }: { id: string }) {
     )
   }
 
+  const handleImageUpload = async (categoryId: string, itemId: string, file: File) => {
+    try {
+      const imageUrl = await uploadImage(file)
+      updateMenuItem(categoryId, itemId, "image", imageUrl)
+      setUploadedImages(prev => ({ ...prev, [itemId]: imageUrl }))
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      })
+    } catch (error) {
+      console.error("Error uploading image:", error)
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      })
+    }
+  }
+
   const handleSaveMenu = async () => {
     setIsSaving(true)
     try {
@@ -201,11 +226,13 @@ export function EditMenuContent({ id }: { id: string }) {
             name: item.name,
             description: item.description,
             price: Number.parseFloat(item.price) || 0,
+            image: uploadedImages[item.id] || item.image || "",
           })),
         })),
         restaurantId: user.uid,
         updatedAt: serverTimestamp(),
       }
+
 
       await safeSetDoc(doc(db, "menus", id), menuData, { merge: true })
 
@@ -319,7 +346,7 @@ export function EditMenuContent({ id }: { id: string }) {
             <CardContent className="space-y-4">
               {category.items.map((item) => (
                 <div key={item.id} className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-4 border rounded-md">
-                  <div className="sm:col-span-12 md:col-span-5 space-y-2">
+                  <div className="sm:col-span-4 space-y-2">
                     <Label htmlFor={`item-name-${item.id}`}>Item Name</Label>
                     <Input
                       id={`item-name-${item.id}`}
@@ -327,7 +354,30 @@ export function EditMenuContent({ id }: { id: string }) {
                       onChange={(e) => updateMenuItem(category.id, item.id, "name", e.target.value)}
                     />
                   </div>
-                  <div className="sm:col-span-6 md:col-span-2 space-y-2">
+                  <div className="sm:col-span-2 space-y-2">
+                    <Label htmlFor={`item-image-${item.id}`}>Image</Label>
+                    <div className="flex items-center gap-2">
+                      {(item.image || uploadedImages[item.id]) && (
+                        <img src={uploadedImages[item.id] || item.image} alt={item.name} className="w-10 h-10 object-cover rounded" />
+                      )}
+                      <label htmlFor={`file-${item.id}`} className="cursor-pointer">
+                        <Image className="h-6 w-6 text-gray-500 hover:text-gray-700" />
+                      </label>
+                      <input
+                        id={`file-${item.id}`}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            handleImageUpload(category.id, item.id, file)
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2 space-y-2">
                     <Label htmlFor={`item-price-${item.id}`}>Price</Label>
                     <Input
                       id={`item-price-${item.id}`}
@@ -338,7 +388,7 @@ export function EditMenuContent({ id }: { id: string }) {
                       min="0"
                     />
                   </div>
-                  <div className="sm:col-span-6 md:col-span-4 space-y-2">
+                  <div className="sm:col-span-3 space-y-2">
                     <Label htmlFor={`item-desc-${item.id}`}>Description</Label>
                     <Input
                       id={`item-desc-${item.id}`}
@@ -346,7 +396,7 @@ export function EditMenuContent({ id }: { id: string }) {
                       onChange={(e) => updateMenuItem(category.id, item.id, "description", e.target.value)}
                     />
                   </div>
-                  <div className="sm:col-span-12 md:col-span-1 flex items-center sm:items-end justify-end mt-2 sm:mt-0">
+                  <div className="sm:col-span-1 flex items-center sm:items-end justify-end mt-2 sm:mt-0">
                     <Button variant="ghost" size="icon" onClick={() => removeMenuItem(category.id, item.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>

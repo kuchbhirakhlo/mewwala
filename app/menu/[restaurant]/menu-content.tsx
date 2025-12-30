@@ -18,6 +18,7 @@ interface MenuItem {
   name: string
   description: string
   price: number
+  image?: string
 }
 
 interface Category {
@@ -195,7 +196,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
           const data = doc.data();
           const menuName = (data.name || '').toLowerCase();
           const restaurantName = (data.restaurantName || data.name || '').toLowerCase();
-          
+
           // Check if either name matches our search term
           if (menuName === searchTerm || restaurantName === searchTerm) {
             matchingMenuDoc = { id: doc.id, data };
@@ -549,10 +550,18 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                   <CardContent className="p-0">
                     {/* Mobile-first layout: Image on top, details below */}
                     <div className="flex flex-col">
-                      {/* Item Image Placeholder */}
+                      {/* Item Image */}
                       <div className="relative h-32 bg-gradient-to-br from-orange-200 to-red-200 flex items-center justify-center overflow-hidden md:h-48 md:w-48 md:flex-shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-300 to-red-300 opacity-50"></div>
-                        <Pizza className="h-8 w-8 text-orange-600 relative z-10 md:h-16 md:w-16" />
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-gradient-to-br from-orange-300 to-red-300 opacity-50"></div>
+                        )}
                         
                         {/* Favorite Button */}
                         <button

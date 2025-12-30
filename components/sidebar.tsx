@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { auth, safeSignOut, safeOnAuthStateChanged } from "@/lib/firebase"
+import { auth, safeSignOut, safeOnAuthStateChanged, db, collection, query, where, safeGetDocs } from "@/lib/firebase"
 import { LayoutDashboard, Utensils, QrCode, LogOut, Menu, ShoppingCart } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
@@ -18,6 +18,8 @@ export function Sidebar() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [hasMenu, setHasMenu] = useState(false)
+  const [menuId, setMenuId] = useState<string | null>(null)
 
   useEffect(() => {
     // Get the current user
@@ -30,6 +32,35 @@ export function Sidebar() {
 
     return () => unsubscribe()
   }, [])
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      if (!user) {
+        setHasMenu(false)
+        setMenuId(null)
+        return
+      }
+
+      try {
+        const menusQuery = query(collection(db, "menus"), where("restaurantId", "==", user.uid))
+        const menusSnapshot = await safeGetDocs(menusQuery)
+
+        if (menusSnapshot.docs.length > 0) {
+          setHasMenu(true)
+          setMenuId(menusSnapshot.docs[0].id)
+        } else {
+          setHasMenu(false)
+          setMenuId(null)
+        }
+      } catch (error) {
+        console.error("Error fetching menu:", error)
+        setHasMenu(false)
+        setMenuId(null)
+      }
+    }
+
+    fetchMenu()
+  }, [user])
 
   const handleSignOut = async () => {
     try {
@@ -57,11 +88,17 @@ export function Sidebar() {
       label: "Dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
-    {
-      href: "/dashboard/menu/create",
-      label: "Create Menu",
-      icon: <Utensils className="h-5 w-5" />,
-    },
+    hasMenu && menuId
+      ? {
+          href: `/dashboard/menu/edit/${menuId}`,
+          label: "Edit Menu",
+          icon: <Utensils className="h-5 w-5" />,
+        }
+      : {
+          href: "/dashboard/menu/create",
+          label: "Create Menu",
+          icon: <Utensils className="h-5 w-5" />,
+        },
     {
       href: "/dashboard/qr-codes",
       label: "QR Codes",
@@ -72,7 +109,7 @@ export function Sidebar() {
       label: "Orders",
       icon: <ShoppingCart className="h-5 w-5" />,
     },
-  ]
+  ].filter(Boolean)
 
   const SidebarContent = () => (
     <>
