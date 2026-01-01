@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
-import { doc, safeGetDoc, setDoc, query, where, getDocs, collection } from "@/lib/firebase"
+import { doc, safeGetDoc, setDoc, query, where, getDocs, collection, safeGetDocs } from "@/lib/firebase"
 import { db } from "@/lib/firebase"
 import { updateDoc, increment, serverTimestamp } from "firebase/firestore"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Pizza, QrCode, Star, Clock, MapPin, Phone, Heart, ShoppingCart, Search, Filter, X } from "lucide-react"
 import React from "react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface MenuItem {
   name: string
@@ -49,6 +49,13 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   const [customerName, setCustomerName] = useState("");
   const [customerMobile, setCustomerMobile] = useState("");
   const [roomTableNumber, setRoomTableNumber] = useState("");
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [ratingCustomerName, setRatingCustomerName] = useState("");
+  const [ratingCustomerMobile, setRatingCustomerMobile] = useState("");
+  const [ratingValue, setRatingValue] = useState(0);
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
 
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length === 0 || !menu?.whatsappNumber) return;
@@ -98,6 +105,48 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
       const url = `https://wa.me/${menu!.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }, 1200);
+  };
+
+  const handleSubmitRating = async () => {
+    if (!ratingCustomerName || !ratingCustomerMobile || ratingValue === 0 || !menu) return;
+    setSubmittingRating(true);
+
+    try {
+      await setDoc(doc(collection(db, "ratings")), {
+        restaurantId: menu.restaurantId,
+        customerName: ratingCustomerName,
+        customerMobile: ratingCustomerMobile,
+        rating: ratingValue,
+        timestamp: serverTimestamp(),
+      });
+
+      // Refetch ratings to update the display
+      try {
+        const ratingsQuery = query(collection(db, "ratings"), where("restaurantId", "==", menu.restaurantId));
+        const ratingsSnapshot = await safeGetDocs(ratingsQuery);
+        const ratings = ratingsSnapshot.docs.map(doc => doc.data());
+
+        if (ratings.length > 0) {
+          const avgRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+          setAverageRating(avgRating);
+          setTotalRatings(ratings.length);
+        } else {
+          setAverageRating(0);
+          setTotalRatings(0);
+        }
+      } catch (fetchError) {
+        console.error("Error refetching ratings:", fetchError);
+      }
+
+      setRatingDialogOpen(false);
+      setRatingCustomerName("");
+      setRatingCustomerMobile("");
+      setRatingValue(0);
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+    } finally {
+      setSubmittingRating(false);
+    }
   };
 
   const handleAddToCart = (item: MenuItem) => {
@@ -212,6 +261,26 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
         const menuDoc = matchingMenuDoc as { id: string; data: Menu };
         const menuData = menuDoc.data;
         setMenu(menuData);
+
+        // Fetch ratings for this restaurant
+        try {
+          const ratingsQuery = query(collection(db, "ratings"), where("restaurantId", "==", menuData.restaurantId));
+          const ratingsSnapshot = await safeGetDocs(ratingsQuery);
+          const ratings = ratingsSnapshot.docs.map(doc => doc.data());
+
+          if (ratings.length > 0) {
+            const avgRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+            setAverageRating(avgRating);
+            setTotalRatings(ratings.length);
+          } else {
+            setAverageRating(0);
+            setTotalRatings(0);
+          }
+        } catch (error) {
+          console.error("Error fetching ratings:", error);
+          setAverageRating(0);
+          setTotalRatings(0);
+        }
         
         try {
           await updateDoc(doc(db, "menus", menuDoc.id), {
@@ -391,10 +460,15 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                   
                   {/* Status */}
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 rounded-full px-3 py-1">
+                    <button
+                      onClick={() => setRatingDialogOpen(true)}
+                      className="flex items-center gap-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full px-3 py-1 transition-colors cursor-pointer"
+                    >
                       <Star className="h-3 w-3 fill-current" />
-                      <span className="text-xs font-semibold">4.8</span>
-                    </div>
+                      <span className="text-xs font-semibold">
+                        {totalRatings > 0 ? averageRating.toFixed(1) : "Rate us"}
+                      </span>
+                    </button>
                     <div className="flex items-center gap-1 bg-green-100 text-green-700 rounded-full px-3 py-1">
                       <Clock className="h-3 w-3" />
                       <span className="text-xs font-semibold">Open</span>
@@ -552,15 +626,22 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                     <div className="flex flex-col">
                       {/* Item Image */}
                       <div className="relative h-32 bg-gradient-to-br from-orange-200 to-red-200 flex items-center justify-center overflow-hidden md:h-48 md:w-48 md:flex-shrink-0">
-                        {item.image ? (
+                        {item?.image ? (
                           <Image
                             src={item.image}
                             alt={item.name}
-                            fill
-                            className="object-cover"
+                            className="w-full h-full object-cover"
+                            width={30}
+                            height={10}
                           />
                         ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-orange-300 to-red-300 opacity-50"></div>
+                          <Image
+                            src="/logo.png"
+                            alt=" Image"
+                            className="w-24 h-24 text-gray-400 opacity-50 md:w-16 md:h-16"
+                            width={50}
+                            height={20}
+                          />
                         )}
                         
                         {/* Favorite Button */}
@@ -801,6 +882,78 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {placingOrder ? 'Placing Order...' : 'Place Order'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rating Dialog */}
+      <Dialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Rate Our Restaurant</DialogTitle>
+            <DialogDescription>
+              Share your feedback by rating us and providing your details.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rating-name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="rating-name"
+                value={ratingCustomerName}
+                onChange={(e) => setRatingCustomerName(e.target.value)}
+                placeholder="Enter your name"
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rating-mobile" className="text-right">
+                Mobile
+              </Label>
+              <Input
+                id="rating-mobile"
+                type="tel"
+                value={ratingCustomerMobile}
+                onChange={(e) => setRatingCustomerMobile(e.target.value)}
+                placeholder="Enter mobile number"
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">
+                Rating
+              </Label>
+              <div className="col-span-3 flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setRatingValue(star)}
+                    className={`p-1 rounded-full transition-colors ${
+                      star <= ratingValue ? 'text-yellow-400' : 'text-gray-300'
+                    }`}
+                  >
+                    <Star className="h-6 w-6 fill-current" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <button
+              onClick={() => setRatingDialogOpen(false)}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitRating}
+              disabled={submittingRating || !ratingCustomerName || !ratingCustomerMobile || ratingValue === 0}
+              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submittingRating ? 'Submitting...' : 'Submit Rating'}
             </button>
           </DialogFooter>
         </DialogContent>

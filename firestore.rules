@@ -41,5 +41,12 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null &&
         (request.auth.uid == resource.data.restaurantId);
     }
+
+    // Allow anyone to create ratings, and restaurant owners to read ratings for their restaurant
+    match /ratings/{ratingId} {
+      allow create: if true; // Allow anyone to submit ratings
+      allow read: if request.auth != null &&
+        (request.auth.uid == resource.data.restaurantId);
+    }
   }
 }

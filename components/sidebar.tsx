@@ -5,7 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { auth, safeSignOut, safeOnAuthStateChanged, db, collection, query, where, safeGetDocs } from "@/lib/firebase"
-import { LayoutDashboard, Utensils, QrCode, LogOut, Menu, ShoppingCart } from "lucide-react"
+import { LayoutDashboard, Utensils, QrCode, LogOut, Menu, ShoppingCart, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
 import { UserAvatar } from "@/components/user-avatar"
@@ -108,6 +108,11 @@ export function Sidebar() {
       href: "/dashboard/orders",
       label: "Orders",
       icon: <ShoppingCart className="h-5 w-5" />,
+    },
+    {
+      href: "/dashboard/ratings",
+      label: "Ratings",
+      icon: <Star className="h-5 w-5" />,
     },
   ].filter(Boolean)
 

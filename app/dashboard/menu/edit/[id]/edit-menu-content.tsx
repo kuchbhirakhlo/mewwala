@@ -54,6 +54,7 @@ export function EditMenuContent({ id }: { id: string }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<Record<string, string>>({})
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -107,6 +108,17 @@ export function EditMenuContent({ id }: { id: string }) {
         }))
 
         setCategories(formattedCategories)
+
+        // Initialize uploadedImages from existing data
+        const initialUploadedImages: Record<string, string> = {}
+        formattedCategories.forEach(category => {
+          category.items.forEach(item => {
+            if (item.image) {
+              initialUploadedImages[item.id] = item.image
+            }
+          })
+        })
+        setUploadedImages(initialUploadedImages)
       } catch (error) {
         console.error("Error fetching menu:", error)
         toast({
@@ -191,15 +203,18 @@ export function EditMenuContent({ id }: { id: string }) {
 
   const handleImageUpload = async (categoryId: string, itemId: string, file: File) => {
     try {
+      setSelectedFiles(prev => ({ ...prev, [itemId]: file.name }))
       const imageUrl = await uploadImage(file)
       updateMenuItem(categoryId, itemId, "image", imageUrl)
       setUploadedImages(prev => ({ ...prev, [itemId]: imageUrl }))
+      setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear filename after successful upload
       toast({
         title: "Success",
         description: "Image uploaded successfully",
       })
     } catch (error) {
       console.error("Error uploading image:", error)
+      setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear on error
       toast({
         title: "Error",
         description: "Failed to upload image",
@@ -360,8 +375,11 @@ export function EditMenuContent({ id }: { id: string }) {
                       {(item.image || uploadedImages[item.id]) && (
                         <img src={uploadedImages[item.id] || item.image} alt={item.name} className="w-10 h-10 object-cover rounded" />
                       )}
-                      <label htmlFor={`file-${item.id}`} className="cursor-pointer">
+                      <label htmlFor={`file-${item.id}`} className="cursor-pointer flex items-center gap-2">
                         <Image className="h-6 w-6 text-gray-500 hover:text-gray-700" />
+                        {selectedFiles[item.id] && (
+                          <span className="text-sm text-gray-600 truncate max-w-32">{selectedFiles[item.id]}</span>
+                        )}
                       </label>
                       <input
                         id={`file-${item.id}`}
