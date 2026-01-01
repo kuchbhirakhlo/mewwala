@@ -13,6 +13,7 @@ import { Pizza, QrCode, Star, Clock, MapPin, Phone, Heart, ShoppingCart, Search,
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import Script from "next/script"
 
 interface MenuItem {
   name: string
@@ -422,6 +423,12 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   }
 
   return (
+    <>
+     <Script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8434537394521880"
+              crossOrigin="anonymous"
+            />
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-orange-100 to-red-100">
@@ -976,5 +983,6 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
         </div>
       </div>
     </div>
+    </>
   )
 }
