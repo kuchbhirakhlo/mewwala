@@ -94,9 +94,9 @@ export default function Home() {
               <div className="flex items-center gap-6 pt-4">
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    <Image src="https://thekeshvicafe.odoo.com/web/image/website/1/logo/The%20Keshvi%20cafe?unique=5a30f8e" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
-                    <Image src="https://thekeshvicafe.odoo.com/web/image/website/1/logo/The%20Keshvi%20cafe?unique=5a30f8e" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
-                    <Image src="https://thekeshvicafe.odoo.com/web/image/website/1/logo/The%20Keshvi%20cafe?unique=5a30f8e" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
+                    <Image src="https://b.zmtcdn.com/merchant/diy/pictures/9/22154459/2d3e416bf3f95ea6f0641500944354a8.jpeg" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
+                    <Image src="https://b.zmtcdn.com/merchant/diy/pictures/9/22154459/2d3e416bf3f95ea6f0641500944354a8.jpeg" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
+                    <Image src="https://b.zmtcdn.com/merchant/diy/pictures/9/22154459/2d3e416bf3f95ea6f0641500944354a8.jpeg" alt="User" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-white" />
                   </div>
                   <span className="text-sm text-gray-600">500+ restaurants trust us</span>
                 </div>

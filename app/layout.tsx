@@ -11,21 +11,92 @@ export const metadata: Metadata = {
   title: "Menuwala - Free Online QR Menu Maker | Digital Restaurant Menus",
   description: "Create stunning digital menus and QR codes for free. Online QR menu maker for restaurants, cafes, and food businesses. Generate QR codes, receive WhatsApp orders, and boost your business.",
   keywords: [
-    "qr menu",
-    "online qr menu maker",
-    "online menu maker for free",
+    // Core Digital Menu Keywords
     "digital menu",
+    "online menu",
+    "digital menu for restaurant",
+    "online restaurant menu",
+    "interactive menu",
+    "touchless menu",
+    "contactless menu",
+    
+    // QR Menu Keywords
+    "qr menu",
+    "qr code menu",
+    "qr menu generator",
+    "qr code generator for restaurant",
     "restaurant qr code",
-    "menu qr generator",
-    "free qr menu maker",
-    "digital restaurant menu",
-    "qr code menu generator",
-    "whatsapp menu ordering",
-    "restaurant digital transformation",
-    "menu maker online",
-    "qr menu creator",
+    "qr code for menu",
+    "scan qr code menu",
+    "digital qr menu",
+    "qr menu maker",
+    "free qr menu",
+    
+    // Free Menu Maker Keywords
+    "free online menu maker",
+    "free menu creator",
     "free digital menu",
-    "restaurant marketing"
+    "free qr menu maker",
+    "free restaurant menu maker",
+    "online menu maker free",
+    "create menu online free",
+    
+    // Restaurant Technology Keywords
+    "restaurant digital menu",
+    "restaurant technology",
+    "restaurant software",
+    "restaurant management",
+    "cafe menu software",
+    "food truck menu",
+    "restaurant ordering system",
+    "digital ordering system",
+    
+    // WhatsApp Ordering Keywords
+    "whatsapp ordering",
+    "whatsapp menu",
+    "order via whatsapp",
+    "whatsapp business ordering",
+    
+    // Menu Creation Keywords
+    "menu maker",
+    "menu creator",
+    "create menu online",
+    "menu design",
+    "restaurant menu design",
+    "food menu design",
+    "menu card design",
+    
+    // Local SEO Keywords
+    "restaurant menu near me",
+    "digital menu India",
+    "qr menu India",
+    "restaurant software India",
+    "cafe menu maker",
+    "food delivery menu",
+    
+    // Business Growth Keywords
+    "restaurant marketing",
+    "boost restaurant sales",
+    "increase restaurant orders",
+    "restaurant online presence",
+    "digital transformation restaurant",
+    
+    // Food Business Keywords
+    "cafe menu",
+    "restaurant menu",
+    "food menu",
+    "pizza menu",
+    "coffee shop menu",
+    "bakery menu",
+    "fast food menu",
+    
+    // Additional High-Volume Keywords
+    "online food ordering",
+    "menu management",
+    "table ordering",
+    "self ordering",
+    "mobile menu",
+    "web menu"
   ],
   authors: [{ name: "Proco Technologies" }],
   creator: "Proco Technologies",
