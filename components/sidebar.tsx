@@ -105,6 +105,11 @@ export function Sidebar() {
       icon: <QrCode className="h-5 w-5" />,
     },
     {
+      href: "/dashboard/qr-card",
+      label: "QR Card",
+      icon: <QrCode className="h-5 w-5" />,
+    },
+    {
       href: "/dashboard/orders",
       label: "Orders",
       icon: <ShoppingCart className="h-5 w-5" />,
