@@ -128,9 +128,9 @@ export function Sidebar() {
         <Image 
               src="/logo.png" 
               alt="Menu Wala Logo" 
-              width={40} 
-              height={40} 
-              className="h-14 w-auto rounded-2xl"
+              width={60} 
+              height={60} 
+              className="h-10 sm:h-12 md:h-14 w-auto rounded-2xl"
             />
         </Link>
       </div>

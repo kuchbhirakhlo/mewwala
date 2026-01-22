@@ -35,14 +35,17 @@ export default function Home() {
             <Image
               src="/logo.png"
               alt="Menu Wala Logo"
-              width={40}
-              height={40}
-              className="h-32 w-auto rounded-2xl"
+              width={80}
+              height={80}
+              className="h-12 sm:h-14 md:h-20 lg:h-24 w-auto rounded-2xl"
             />
           </div>
           <nav className="hidden md:flex gap-6">
             <Link href="#features" className="text-sm font-medium text-white hover:underline underline-offset-4">
               Features
+            </Link>
+            <Link href="#demo" className="text-sm font-medium text-white hover:underline underline-offset-4">
+              Demo
             </Link>
             <Link href="#pricing" className="text-sm font-medium text-white hover:underline underline-offset-4">
               Pricing
@@ -282,6 +285,42 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Demo Section */}
+        <section id="demo" className="w-full py-20 md:py-32 bg-gradient-to-b from-white to-orange-50">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
+              <div className="space-y-2">
+                <div className="inline-block px-4 py-2 rounded-full bg-orange-100 text-orange-600 font-medium text-sm">
+                  <Camera className="w-4 h-4 mr-2 inline" />
+                  See It In Action
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+                  Watch Our Demo
+                </h2>
+                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                  Explore how our digital menu platform works and see the features in action
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8">
+              {[6, 5, 4, 3, 2, 1].map((num) => (
+                <div key={num} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 flex-shrink-0" style={{ width: '280px' }}>
+                  <Image
+                    src={`/demo${num}.png`}
+                    alt={`Demo ${num}`}
+                    width={280}
+                    height={600}
+                    className="w-full h-auto object-contain"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                    <span className="text-white font-semibold text-lg">Demo {num}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section id="pricing" className="w-full py-20 md:py-32 bg-gradient-to-b from-orange-50 to-white">
           <div className="container px-4 md:px-6">
@@ -306,7 +345,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <Badge className="bg-orange-500 text-white">Currently Active</Badge>
                     <CardTitle className="text-2xl font-bold text-orange-600">Free</CardTitle>
-                    <div className="text-4xl font-bold text-gray-900">$0</div>
+                    <div className="text-4xl font-bold text-gray-900">₹0</div>
                     <CardDescription>Perfect for getting started</CardDescription>
                   </div>
                 </CardHeader>
@@ -347,7 +386,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <Badge variant="outline" className="bg-gray-100 text-gray-600">Coming Soon</Badge>
                     <CardTitle className="text-2xl font-bold text-gray-600">Professional</CardTitle>
-                    <div className="text-4xl font-bold text-gray-900">$29</div>
+                    <div className="text-4xl font-bold text-gray-900">₹299</div>
                     <CardDescription className="text-gray-500">per month</CardDescription>
                   </div>
                 </CardHeader>
@@ -390,7 +429,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <Badge variant="outline" className="bg-gray-100 text-gray-600">Coming Soon</Badge>
                     <CardTitle className="text-2xl font-bold text-gray-600">Enterprise</CardTitle>
-                    <div className="text-4xl font-bold text-gray-900">$99</div>
+                    <div className="text-4xl font-bold text-gray-900">₹499</div>
                     <CardDescription className="text-gray-500">per month</CardDescription>
                   </div>
                 </CardHeader>

@@ -240,9 +240,9 @@ export default function LoginPage() {
           <Image 
               src="/logo.png" 
               alt="Menu Wala Logo" 
-              width={40} 
-              height={40} 
-              className="h-14 w-auto rounded-2xl"
+              width={80} 
+              height={80} 
+              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto rounded-2xl"
             />
       </Link>
       <Card className="w-full max-w-md border-orange-200 shadow-lg bg-white">

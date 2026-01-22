@@ -238,7 +238,7 @@ export default function DashboardPage() {
         <TabsContent value="overview" className="space-y-6">
           <Card className="border-orange-200 bg-white shadow-lg">
             <CardHeader className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
-              <CardTitle>Get Started with MakeMyMenu</CardTitle>
+              <CardTitle>Get Started with MenuWala</CardTitle>
               <CardDescription className="text-orange-100">
                 Follow these steps to create your digital menu and QR code
               </CardDescription>
