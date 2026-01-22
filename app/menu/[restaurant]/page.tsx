@@ -9,32 +9,7 @@ interface MenuData {
   restaurantName?: string;
 }
 
-export async function generateStaticParams() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "menus"));
-    const params: { restaurant: string }[] = [];
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data() as MenuData;
-      const names = [data.name, data.restaurantName].filter(Boolean);
-
-      names.forEach((name) => {
-        const slug = name!.replace(/\s+/g, '-').toLowerCase();
-        params.push({ restaurant: slug });
-      });
-    });
-
-    // Remove duplicates
-    const uniqueParams = params.filter((param, index, self) =>
-      index === self.findIndex(p => p.restaurant === param.restaurant)
-    );
-
-    return uniqueParams;
-  } catch (error) {
-    console.error("Error generating static params:", error);
-    return [];
-  }
-}
+export const dynamic = 'force-dynamic';
 
 // This is a Server Component that safely extracts params and passes them as props
 export async function generateMetadata({ params }: { params: { restaurant: string } }): Promise<Metadata> {

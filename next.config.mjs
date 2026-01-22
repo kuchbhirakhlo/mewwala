@@ -9,7 +9,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'export',
   // Disable experimental features
   experimental: {
     // No trace option here
