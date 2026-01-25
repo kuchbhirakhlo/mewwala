@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ProcoAI } from "@/components/proco-ai"
 import { 
   ArrowRight, 
   Coffee, 
@@ -28,6 +29,7 @@ import {
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
+      <ProcoAI />
       {/* Header */}
       <header className="border-b bg-black sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
