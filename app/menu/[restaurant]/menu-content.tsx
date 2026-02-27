@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Pizza, QrCode, Star, Clock, MapPin, Phone, Heart, ShoppingCart, Search, Filter, X } from "lucide-react"
+import { Store, QrCode, Star, Clock, MapPin, Phone, Heart, ShoppingCart, Search, Filter, X, Pizza } from "lucide-react"
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -49,7 +49,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerMobile, setCustomerMobile] = useState("");
-  const [roomTableNumber, setRoomTableNumber] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const [ratingCustomerName, setRatingCustomerName] = useState("");
   const [ratingCustomerMobile, setRatingCustomerMobile] = useState("");
@@ -64,16 +64,16 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   };
 
   const handleSubmitOrder = async () => {
-    if (!customerName || !customerMobile || !roomTableNumber || !menu) return;
+    if (!customerName || !customerMobile || !customerAddress || !menu) return;
     setPlacingOrder(true);
 
     // Calculate total amount at the time of order
     const currentTotal = Object.values(cart).reduce((sum, entry) => sum + entry.item.price * entry.quantity, 0);
 
-    let message = `🍽️ *New Order from: ${menu?.name || ''}*\n\n`;
+    let message = `📦 *New Order from: ${menu?.name || ''}*\n\n`;
     message += `👤 *Customer Name:* ${customerName}\n`;
     message += `📱 *Mobile:* ${customerMobile}\n`;
-    message += `🏠 *Room/Table:* ${roomTableNumber}\n\n`;
+    message += `🏠 *Address:* ${customerAddress}\n\n`;
     Object.values(cart).forEach((entry, idx) => {
       message += `${idx + 1}. ${entry.item.name} x${entry.quantity} - ₹${(entry.item.price * entry.quantity).toFixed(2)}\n`;
     });
@@ -85,7 +85,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
         restaurantId: menu!.restaurantId,
         customerName,
         customerMobile,
-        roomTableNumber,
+        customerAddress,
         items: Object.values(cart).map(entry => ({ name: entry.item.name, quantity: entry.quantity, price: entry.item.price })),
         total: currentTotal,
         timestamp: serverTimestamp(),
@@ -101,7 +101,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
       // Reset form
       setCustomerName("");
       setCustomerMobile("");
-      setRoomTableNumber("");
+      setCustomerAddress("");
       setCart({});
       const url = `https://wa.me/${menu!.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
@@ -384,13 +384,13 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 p-4">
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
         <div className="text-center">
           <div className="relative">
-            <div className="h-12 w-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto md:h-16 md:w-16"></div>
-            <Pizza className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-4 w-4 text-orange-500 md:h-6 md:w-6" />
+            <div className="h-12 w-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto md:h-16 md:w-16"></div>
+            <Store className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 md:h-6 md:w-6" />
           </div>
-          <p className="mt-3 text-orange-700 font-medium text-sm md:text-base">Loading  menu...</p>
+          <p className="mt-3 text-blue-700 font-medium text-sm md:text-base">Loading catalog...</p>
         </div>
       </div>
     )
@@ -398,7 +398,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
 
   if (error || !menu) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 p-4">
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-red-50 to-blue-50 p-4">
         <Card className="w-full max-w-sm border-red-200 md:max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-3 h-12 w-12 bg-red-100 rounded-full flex items-center justify-center md:mb-4 md:h-16 md:w-16">
@@ -429,18 +429,18 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8434537394521880"
               crossOrigin="anonymous"
             />
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-orange-100 to-red-100">
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100">
         <div className="absolute inset-0">
-          <div className="absolute top-4 left-4 w-16 h-16 bg-orange-200 rounded-full opacity-30 animate-pulse"></div>
-          <div className="absolute top-20 right-8 w-12 h-12 bg-red-200 rounded-full opacity-20 animate-bounce"></div>
+          <div className="absolute top-4 left-4 w-16 h-16 bg-blue-200 rounded-full opacity-30 animate-pulse"></div>
+          <div className="absolute top-20 right-8 w-12 h-12 bg-purple-200 rounded-full opacity-20 animate-bounce"></div>
           <div className="absolute bottom-8 left-1/3 w-10 h-10 bg-pink-200 rounded-full opacity-25 animate-pulse delay-1000"></div>
         </div>
         
         <div className="relative container mx-auto px-4 py-6 max-w-4xl">
           {/* Restaurant Info Card */}
-          <div className="bg-white rounded-3xl shadow-xl border border-orange-200 p-6 md:p-8">
+          <div className="bg-white rounded-3xl shadow-xl border border-blue-200 p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               {/* Left Column - Logo & Name */}
               <div className="flex items-center gap-4">
@@ -450,7 +450,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                     alt="Restaurant Logo"
                     width={70}
                     height={70}
-                    className="h-16 w-16 rounded-2xl shadow-lg border-2 border-orange-200"
+                    className="h-16 w-16 rounded-2xl shadow-lg border-2 border-blue-200"
                   />
                   <div className="absolute -top-1 -right-1 h-5 w-5 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
                 </div>
@@ -508,7 +508,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 md:h-5 md:w-5" />
           <input
             type="text"
-            placeholder="Search for dishes..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-black bg-white shadow-sm md:py-4"
@@ -686,7 +686,6 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                               <div className="text-lg font-black text-green-600 md:text-3xl">
                                 ₹{item.price.toFixed(2)}
                               </div>
-                              <div className="text-xs text-gray-500 md:text-sm">per plate</div>
                             </div>
 
                             {/* Add to Cart / Quantity Controls */}
@@ -864,14 +863,14 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="roomTable" className="text-right">
-                Room/Table
+              <Label htmlFor="address" className="text-right">
+                Address
               </Label>
               <Input
-                id="roomTable"
-                value={roomTableNumber}
-                onChange={(e) => setRoomTableNumber(e.target.value)}
-                placeholder="Room or Table number"
+                id="address"
+                value={customerAddress}
+                onChange={(e) => setCustomerAddress(e.target.value)}
+                placeholder="Enter delivery address"
                 className="col-span-3"
               />
             </div>
@@ -885,7 +884,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
             </button>
             <button
               onClick={handleSubmitOrder}
-              disabled={placingOrder || !customerName || !customerMobile || !roomTableNumber}
+              disabled={placingOrder || !customerName || !customerMobile || !customerAddress}
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {placingOrder ? 'Placing Order...' : 'Place Order'}

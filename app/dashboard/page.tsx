@@ -6,11 +6,44 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { auth, doc, safeGetDoc, db, collection, query, where, safeGetDocs, getDocs } from "@/lib/firebase"
 import { orderBy, limit } from "firebase/firestore"
-import { QrCode, Utensils, Users, Coffee, Pizza, IceCream, BarChart3, ChevronUp, Clock } from "lucide-react"
+import { QrCode, Store, Users, Coffee, Dumbbell, BookOpen, Scissors, Heart, Car, Laptop, Pizza, BarChart3, ChevronUp, Clock } from "lucide-react"
 import Link from "next/link"
 
+const businessTypeIcons: Record<string, any> = {
+  restaurant: Pizza,
+  retail: Store,
+  salon: Scissors,
+  healthcare: Heart,
+  services: Users,
+  automotive: Car,
+  realestate: Store,
+  ecommerce: Laptop,
+  fitness: Dumbbell,
+  education: BookOpen,
+  entertainment: Coffee,
+  hospitality: Store,
+  other: Store,
+}
+
+const businessTypeLabels: Record<string, string> = {
+  restaurant: "Restaurant",
+  retail: "Retail Shop",
+  salon: "Salon & Spa",
+  healthcare: "Healthcare",
+  services: "Professional Services",
+  automotive: "Automotive",
+  realestate: "Real Estate",
+  ecommerce: "E-Commerce",
+  fitness: "Fitness",
+  education: "Education",
+  entertainment: "Entertainment",
+  hospitality: "Hospitality",
+  other: "Business",
+}
+
 export default function DashboardPage() {
-  const [restaurantName, setRestaurantName] = useState("")
+  const [businessName, setBusinessName] = useState("")
+  const [businessType, setBusinessType] = useState("restaurant")
   const [loading, setLoading] = useState(true)
   const [hasMenu, setHasMenu] = useState(false)
   const [menuId, setMenuId] = useState<string | null>(null)
@@ -25,15 +58,16 @@ export default function DashboardPage() {
         const user = auth.currentUser
         if (user) {
           console.log("Fetching restaurant data for user:", user.uid)
-          // Get restaurant data
-          const docRef = doc(db, "restaurants", user.uid)
+          // Get business data
+          const docRef = doc(db, "businesses", user.uid)
           const docSnap = await safeGetDoc(docRef)
 
           if (docSnap.exists()) {
-            setRestaurantName(docSnap.data().restaurantName || "My Restaurant")
-            console.log("Restaurant name:", docSnap.data().restaurantName)
+            setBusinessName(docSnap.data().businessName || "My Business")
+            setBusinessType(docSnap.data().businessType || "restaurant")
+            console.log("Business name:", docSnap.data().businessName)
           } else {
-            console.log("No restaurant document found")
+            console.log("No business document found")
           }
 
           // Check if user already has a menu
@@ -142,25 +176,25 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8 bg-gradient-to-br from-orange-50 to-amber-50">
+    <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8 bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-orange-600">Welcome, {restaurantName}!</h2>
-          <p className="text-orange-600/80">Manage your digital menu and QR codes</p>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-blue-600">Welcome, {businessName}!</h2>
+          <p className="text-blue-600/80">Manage your {businessTypeLabels[businessType] || 'business'} and QR codes</p>
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
           {!hasMenu ? (
             <Link href="/dashboard/menu/create" className="w-full md:w-auto">
-              <Button className="bg-orange-500 hover:bg-orange-600 shadow-md w-full">
-                <Utensils className="mr-2 h-4 w-4" />
-                Create Menu
+              <Button className="bg-blue-500 hover:bg-blue-600 shadow-md w-full">
+                <Store className="mr-2 h-4 w-4" />
+                Create Catalog
               </Button>
             </Link>
           ) : (
             <Link href={`/dashboard/menu/edit/${menuId}`} className="w-full md:w-auto">
-              <Button className="bg-orange-500 hover:bg-orange-600 shadow-md w-full">
-                <Utensils className="mr-2 h-4 w-4" />
-                Edit Menu
+              <Button className="bg-blue-500 hover:bg-blue-600 shadow-md w-full">
+                <Store className="mr-2 h-4 w-4" />
+                Edit Catalog
               </Button>
             </Link>
           )}
@@ -207,8 +241,8 @@ export default function DashboardPage() {
         <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white shadow-md overflow-hidden">
           <div className="absolute top-0 right-0 w-16 h-16 bg-orange-100 rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-lg font-medium text-orange-600">Menu Status</CardTitle>
-            <Utensils className="h-5 w-5 text-orange-400" />
+            <CardTitle className="text-lg font-medium text-blue-600">Catalog Status</CardTitle>
+            <Store className="h-5 w-5 text-blue-400" />
           </CardHeader>
           <CardContent className="relative z-10">
             <div className="text-xl font-bold text-orange-700">{hasMenu ? "Created" : "Not Created"}</div>
@@ -237,10 +271,10 @@ export default function DashboardPage() {
 
         <TabsContent value="overview" className="space-y-6">
           <Card className="border-orange-200 bg-white shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
               <CardTitle>Get Started with MenuWala</CardTitle>
-              <CardDescription className="text-orange-100">
-                Follow these steps to create your digital menu and QR code
+              <CardDescription className="text-blue-100">
+                Follow these steps to create your digital catalog and QR code
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 md:p-6">
@@ -252,11 +286,11 @@ export default function DashboardPage() {
                       <div className="bg-blue-100 p-2 rounded-full">
                         <Coffee className="h-5 w-5 text-blue-600" />
                       </div>
-                      <CardTitle className="text-lg text-blue-600">1. Create Menu</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">1. Create Catalog</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-blue-600 mb-4">Add categories and items to your digital menu</p>
+                    <p className="text-sm text-blue-600 mb-4">Add categories and items to your digital catalog</p>
                     {!hasMenu ? (
                       <Link href="/dashboard/menu/create" className="block">
                         <Button variant="outline" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
@@ -280,11 +314,11 @@ export default function DashboardPage() {
                       <div className="bg-orange-100 p-2 rounded-full">
                         <Pizza className="h-5 w-5 text-orange-600" />
                       </div>
-                      <CardTitle className="text-lg text-orange-600">2. Customize</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">2. Customize</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-orange-600 mb-4">Personalize your menu with categories and items</p>
+                    <p className="text-sm text-blue-600 mb-4">Personalize your catalog with categories and items</p>
                     {!hasMenu ? (
                       <Button variant="outline" className="w-full border-orange-300 text-orange-600 hover:bg-orange-50" disabled>
                         Create Menu First
@@ -306,11 +340,11 @@ export default function DashboardPage() {
                       <div className="bg-green-100 p-2 rounded-full">
                         <QrCode className="h-5 w-5 text-green-600" />
                       </div>
-                      <CardTitle className="text-lg text-green-600">3. Share</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">3. Share</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-green-600 mb-4">Generate QR code for customers to scan</p>
+                    <p className="text-sm text-blue-600 mb-4">Generate QR code for customers to scan</p>
                     {!hasMenu ? (
                       <Button variant="outline" className="w-full border-green-300 text-green-600 hover:bg-green-50" disabled>
                         Create Menu First

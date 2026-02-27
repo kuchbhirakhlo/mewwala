@@ -236,12 +236,12 @@ export default function CreateMenuPage() {
       <div className="grid gap-6">
         <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white">
           <CardHeader>
-            <CardTitle className="text-orange-600">Menu Details</CardTitle>
+            <CardTitle className="text-blue-600">Catalog Details</CardTitle>
             <CardDescription>Enter the basic information about your menu</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="menu-name">Menu Name</Label>
+              <Label htmlFor="menu-name">Catalog Name</Label>
               <Input
                 id="menu-name"
                 value={menuName}

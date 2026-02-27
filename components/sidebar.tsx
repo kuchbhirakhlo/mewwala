@@ -12,6 +12,7 @@ import { UserAvatar } from "@/components/user-avatar"
 import { useEffect, useState } from "react"
 import type { User } from "firebase/auth"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { LanguageToggle } from "@/components/language-toggle"
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -105,11 +106,6 @@ export function Sidebar() {
       icon: <QrCode className="h-5 w-5" />,
     },
     {
-      href: "/dashboard/qr-card",
-      label: "QR Card",
-      icon: <QrCode className="h-5 w-5" />,
-    },
-    {
       href: "/dashboard/orders",
       label: "Orders",
       icon: <ShoppingCart className="h-5 w-5" />,
@@ -123,7 +119,7 @@ export function Sidebar() {
 
   const SidebarContent = () => (
     <>
-      <div className="flex h-16 items-center border-b px-4 bg-gradient-to-r from-orange-500 to-amber-500">
+      <div className="flex h-16 items-center border-b px-4 bg-gradient-to-r from-blue-500 to-purple-500 justify-between">
         <Link href="/dashboard" className="flex items-center gap-2 font-bold text-white">
         <Image 
               src="/logo.png" 
@@ -133,8 +129,9 @@ export function Sidebar() {
               className="h-10 sm:h-12 md:h-14 w-auto rounded-2xl"
             />
         </Link>
+        <LanguageToggle />
       </div>
-      <div className="flex-1 overflow-auto py-4 bg-gradient-to-b from-orange-50 to-amber-50">
+      <div className="flex-1 overflow-auto py-4 bg-gradient-to-b from-blue-50 to-purple-50">
         {user && (
           <div className="px-4 py-2 mb-4 flex items-center gap-3 border-b border-orange-100 pb-4">
             <UserAvatar user={user} />
@@ -155,8 +152,8 @@ export function Sidebar() {
                 href={link.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-orange-500 text-white shadow-md"
-                    : "text-gray-700 hover:bg-orange-100 hover:text-orange-600"
+                    ? "bg-blue-500 text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-100 hover:text-blue-600"
                 }`}
                 onClick={() => setIsMobileOpen(false)}
               >
@@ -170,7 +167,7 @@ export function Sidebar() {
       <div className="border-t p-4 bg-orange-50">
         <Button
           variant="outline"
-          className="w-full justify-start text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700"
+          className="w-full justify-start text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700"
           onClick={handleSignOut}
         >
           <LogOut className="mr-2 h-4 w-4" />
@@ -183,7 +180,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar (always visible) */}
-      <div className="hidden md:flex h-screen w-64 flex-col border-r bg-white shadow-md fixed left-0 top-0 z-20">
+      <div className="flex h-screen w-64 flex-col border-r bg-white shadow-md fixed left-0 top-0 z-20">
         <SidebarContent />
       </div>
       

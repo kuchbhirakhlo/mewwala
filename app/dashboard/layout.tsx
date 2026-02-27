@@ -10,6 +10,7 @@ import { auth, safeOnAuthStateChanged } from "@/lib/firebase"
 import { Sidebar } from "@/components/sidebar"
 import { QrCode } from "lucide-react"
 import Link from "next/link"
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 
 export default function DashboardLayout({
   children,
@@ -36,7 +37,7 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-b from-orange-100 to-amber-50">
+      <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-b from-blue-100 to-purple-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
           <p className="text-orange-600 font-medium">Loading your dashboard...</p>
@@ -53,7 +54,7 @@ export default function DashboardLayout({
         crossOrigin="anonymous"
         strategy="beforeInteractive"
       />
-      <div className="flex min-h-screen bg-orange-50">
+      <div className="flex min-h-screen bg-blue-50">
       {/* Desktop Sidebar */}
       <Sidebar />
       
@@ -80,6 +81,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+      <PwaInstallPrompt />
       </div>
     </>
   )
