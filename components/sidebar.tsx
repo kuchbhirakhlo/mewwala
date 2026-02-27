@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast"
 import { UserAvatar } from "@/components/user-avatar"
 import { useEffect, useState } from "react"
 import type { User } from "firebase/auth"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { LanguageToggle } from "@/components/language-toggle"
 
 export function Sidebar() {
@@ -21,6 +21,13 @@ export function Sidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [hasMenu, setHasMenu] = useState(false)
   const [menuId, setMenuId] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    // Ensure mobile sidebar is closed on mount
+    setIsMobileOpen(false)
+  }, [])
 
   useEffect(() => {
     // Get the current user
@@ -179,12 +186,13 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar (always visible) */}
-      <div className="flex h-screen w-64 flex-col border-r bg-white shadow-md fixed left-0 top-0 z-20">
+      {/* Desktop sidebar (always visible on md+ screens) */}
+      <div className="hidden md:flex h-screen w-64 flex-col border-r bg-white shadow-md fixed left-0 top-0 z-20">
         <SidebarContent />
       </div>
       
       {/* Mobile sidebar (only visible when toggled) */}
+      {mounted && (
       <div className="md:hidden fixed z-50 top-3 left-4">
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
@@ -197,6 +205,7 @@ export function Sidebar() {
           </SheetContent>
         </Sheet>
       </div>
+      )}
     </>
   )
 }
