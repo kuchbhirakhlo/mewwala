@@ -26,7 +26,7 @@ const businessTypeIcons: Record<string, any> = {
 }
 
 const businessTypeLabels: Record<string, string> = {
-  restaurant: "Restaurant",
+  restaurant: "Business",
   retail: "Retail Shop",
   salon: "Salon & Spa",
   healthcare: "Healthcare",

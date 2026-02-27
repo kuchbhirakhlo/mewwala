@@ -12,13 +12,13 @@ interface MenuData {
 export const dynamic = 'force-dynamic';
 
 // This is a Server Component that safely extracts params and passes them as props
-export async function generateMetadata({ params }: { params: { restaurant: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { business: string } }): Promise<Metadata> {
   const resolvedParams = await params;
-  const restaurant = resolvedParams.restaurant;
+  const business = resolvedParams.business;
 
   try {
-    // Convert restaurant parameter back to search format
-    const searchTerm = restaurant.replace(/-/g, ' ').toLowerCase();
+    // Convert business parameter back to search format
+    const searchTerm = business.replace(/-/g, ' ').toLowerCase();
 
     // Get all menus and find the matching one
     const querySnapshot = await getDocs(collection(db, "menus"));
@@ -45,13 +45,13 @@ export async function generateMetadata({ params }: { params: { restaurant: strin
         description,
         keywords: [
           "digital menu",
-          "restaurant menu",
+          "business menu",
           "qr menu",
           "online ordering",
           "whatsapp ordering",
           menu.name,
           "food menu",
-          "restaurant digital transformation"
+          "business digital transformation"
         ],
         openGraph: {
           title,
@@ -81,11 +81,11 @@ export async function generateMetadata({ params }: { params: { restaurant: strin
   // Fallback metadata
   return {
     title: "Digital Menu | QR Menu",
-    description: "View restaurant digital menu and order via QR code.",
+    description: "View business digital menu and order via QR code.",
   };
 }
 
-export default async function MenuPage({ params }: { params: { restaurant: string } }) {
+export default async function MenuPage({ params }: { params: { business: string } }) {
   const resolvedParams = await params;
-  return <MenuContent restaurant={resolvedParams.restaurant} />;
+  return <MenuContent restaurant={resolvedParams.business} />;
 }

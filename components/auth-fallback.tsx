@@ -21,7 +21,7 @@ export function AuthFallback({ mode, onDemoAuth }: AuthFallbackProps) {
   const [showFallback, setShowFallback] = useState(false)
   const [email, setEmail] = useState("demo@example.com")
   const [password, setPassword] = useState("password")
-  const [restaurantName, setRestaurantName] = useState("Demo Restaurant")
+  const [restaurantName, setRestaurantName] = useState("Demo Business")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -92,7 +92,7 @@ export function AuthFallback({ mode, onDemoAuth }: AuthFallbackProps) {
             {mode === "signup" && (
               <div className="space-y-2">
                 <Label htmlFor="restaurantName" className="text-orange-700">
-                  Restaurant Name
+                  Business Name
                 </Label>
                 <Input
                   id="restaurantName"

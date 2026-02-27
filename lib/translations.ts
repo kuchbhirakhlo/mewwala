@@ -114,7 +114,7 @@ export const translations: Record<Language, Translations> = {
     heroCta: "Start Free",
     
     // Business types
-    restaurant: "Restaurant",
+    restaurant: "Business",
     shop: "Shop",
     salon: "Salon",
     clinic: "Clinic",
@@ -209,7 +209,7 @@ export const translations: Record<Language, Translations> = {
     heroCta: "मुफ्त शुरू करें",
     
     // Business types
-    restaurant: "रेस्तरां",
+    restaurant: "व्यापार",
     shop: "दुकान",
     salon: "सैलून",
     clinic: "क्लीनिक",

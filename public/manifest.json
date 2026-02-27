@@ -1,7 +1,7 @@
 {
-  "name": "MenuWala - Restaurant QR Menu Generator",
+  "name": "MenuWala - Business QR Menu Generator",
   "short_name": "Menuwala",
-  "description": "Create beautiful digital menus and QR codes for your restaurant",
+  "description": "Create beautiful digital menus and QR codes for your business",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

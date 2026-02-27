@@ -47,7 +47,7 @@ export default function HomePage() {
   const { language, t } = useLanguage()
   const isHindi = language === 'hi'
   const businessTypes = [
-    { name: "Restaurant", icon: Utensils, color: "orange", description: "Digital menus for restaurants, cafes & food businesses" },
+    { name: "Business", icon: Utensils, color: "orange", description: "Digital menus for businesses, cafes & food businesses" },
     { name: "Retail Shop", icon: ShoppingBag, color: "blue", description: "Product catalogs for retail stores & shops" },
     { name: "Salon & Spa", icon: Scissors, color: "pink", description: "Services & pricing for salons & beauty spas" },
     { name: "Healthcare", icon: Heart, color: "red", description: "Medical services & doctor consultations" },
@@ -157,12 +157,12 @@ export default function HomePage() {
                 <div className="absolute -top-8 -left-8 w-32 h-32 bg-purple-400 rounded-full opacity-20 blur-2xl"></div>
                 <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-blue-400 rounded-full opacity-20 blur-2xl"></div>
                 <div className="relative z-10 grid grid-cols-3 gap-4 p-8">
-                  {/* Restaurant */}
+                  {/* Business */}
                   <div className="flex flex-col items-center bg-white rounded-2xl p-4 shadow-lg">
                     <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-2">
                       <Utensils className="h-8 w-8 text-orange-500" />
                     </div>
-                    <span className="text-xs font-medium text-gray-600">Restaurant</span>
+                    <span className="text-xs font-medium text-gray-600">Business</span>
                   </div>
                   {/* Retail */}
                   <div className="flex flex-col items-center bg-white rounded-2xl p-4 shadow-lg">
@@ -424,7 +424,7 @@ export default function HomePage() {
                   <CardTitle className="text-xl text-blue-600">Sign Up & Choose Business</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center text-gray-600">
-                  <p>Create your free account and select your business type from restaurants, shops, salons, clinics, and more.</p>
+                  <p>Create your free account and select your business type from businesses, shops, salons, clinics, and more.</p>
                 </CardContent>
               </Card>
 
@@ -664,7 +664,7 @@ export default function HomePage() {
                   </p>
                   <ol className="list-decimal list-inside space-y-2 text-gray-600 ml-4">
                     <li><strong>Sign up for free</strong> - Create your account in less than 2 minutes</li>
-                    <li><strong>Select your business type</strong> - Choose from restaurant, salon, clinic, shop, and more</li>
+                    <li><strong>Select your business type</strong> - Choose from business, salon, clinic, shop, and more</li>
                     <li><strong>Add your business details</strong> - Upload your logo, set your business name and description</li>
                     <li><strong>Create your catalog</strong> - Add products, services, or menu items</li>
                     <li><strong>Customize the design</strong> - Choose colors and fonts that match your brand</li>

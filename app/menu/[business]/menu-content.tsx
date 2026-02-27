@@ -36,7 +36,7 @@ interface Menu {
   whatsappNumber?: string
 }
 
-export function MenuContent({ restaurant }: { restaurant: string }) {
+export function MenuContent({ restaurant: business }: { restaurant: string }) {
   const [menu, setMenu] = useState<Menu | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -233,10 +233,10 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        // Convert restaurant parameter back to search format
+        // Convert business parameter back to search format
         // The QR code converts spaces to hyphens and makes it lowercase
         // So we need to reverse this process
-        const searchTerm = restaurant.replace(/-/g, ' ').toLowerCase();
+        const searchTerm = business.replace(/-/g, ' ').toLowerCase();
         
         // Get all menus and find the matching one
         const querySnapshot = await getDocs(collection(db, "menus"));
@@ -321,7 +321,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
     }
 
     fetchMenu()
-  }, [restaurant])
+  }, [business])
 
   const getDeviceInfo = () => {
     const ua = navigator.userAgent;
@@ -439,7 +439,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
         </div>
         
         <div className="relative container mx-auto px-4 py-6 max-w-4xl">
-          {/* Restaurant Info Card */}
+          {/* Business Info Card */}
           <div className="bg-white rounded-3xl shadow-xl border border-blue-200 p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               {/* Left Column - Logo & Name */}
@@ -447,7 +447,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
                 <div className="relative">
                   <Image
                     src="/logo.png"
-                    alt="Restaurant Logo"
+                    alt="Business Logo"
                     width={70}
                     height={70}
                     className="h-16 w-16 rounded-2xl shadow-lg border-2 border-blue-200"
@@ -897,7 +897,7 @@ export function MenuContent({ restaurant }: { restaurant: string }) {
       <Dialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Rate Our Restaurant</DialogTitle>
+            <DialogTitle>Rate Our Business</DialogTitle>
             <DialogDescription>
               Share your feedback by rating us and providing your details.
             </DialogDescription>
