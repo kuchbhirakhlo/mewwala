@@ -5,7 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { auth, safeSignOut, safeOnAuthStateChanged, db, collection, query, where, safeGetDocs } from "@/lib/firebase"
-import { LayoutDashboard, Utensils, QrCode, LogOut, Menu, ShoppingCart, Star } from "lucide-react"
+import { LayoutDashboard, Store, QrCode, LogOut, Menu, ShoppingCart, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
 import { UserAvatar } from "@/components/user-avatar"
@@ -99,13 +99,13 @@ export function Sidebar() {
     hasMenu && menuId
       ? {
           href: `/dashboard/menu/edit/${menuId}`,
-          label: "Edit Menu",
-          icon: <Utensils className="h-5 w-5" />,
+          label: "Edit Catalog",
+          icon: <Store className="h-5 w-5" />,
         }
       : {
           href: "/dashboard/menu/create",
-          label: "Create Menu",
-          icon: <Utensils className="h-5 w-5" />,
+          label: "Create Catalog",
+          icon: <Store className="h-5 w-5" />,
         },
     {
       href: "/dashboard/qr-codes",

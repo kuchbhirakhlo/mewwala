@@ -6,21 +6,21 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { auth, doc, safeGetDoc, db, collection, query, where, safeGetDocs, getDocs } from "@/lib/firebase"
 import { orderBy, limit } from "firebase/firestore"
-import { QrCode, Store, Users, Coffee, Dumbbell, BookOpen, Scissors, Heart, Car, Laptop, Pizza, BarChart3, ChevronUp, Clock } from "lucide-react"
+import { QrCode, Store, Users, BarChart3, ChevronUp, Clock, Building2 } from "lucide-react"
 import Link from "next/link"
 
 const businessTypeIcons: Record<string, any> = {
-  restaurant: Pizza,
+  restaurant: Store,
   retail: Store,
-  salon: Scissors,
-  healthcare: Heart,
-  services: Users,
-  automotive: Car,
+  salon: Store,
+  healthcare: Store,
+  services: Store,
+  automotive: Store,
   realestate: Store,
-  ecommerce: Laptop,
-  fitness: Dumbbell,
-  education: BookOpen,
-  entertainment: Coffee,
+  ecommerce: Store,
+  fitness: Store,
+  education: Store,
+  entertainment: Store,
   hospitality: Store,
   other: Store,
 }
@@ -284,7 +284,7 @@ export default function DashboardPage() {
                   <CardHeader className="p-4 relative z-10">
                     <div className="flex items-center gap-2">
                       <div className="bg-blue-100 p-2 rounded-full">
-                        <Coffee className="h-5 w-5 text-blue-600" />
+                        <Store className="h-5 w-5 text-blue-600" />
                       </div>
                       <CardTitle className="text-lg text-blue-600">1. Create Catalog</CardTitle>
                     </div>
@@ -312,7 +312,7 @@ export default function DashboardPage() {
                   <CardHeader className="p-4 relative z-10">
                     <div className="flex items-center gap-2">
                       <div className="bg-orange-100 p-2 rounded-full">
-                        <Pizza className="h-5 w-5 text-orange-600" />
+                        <Store className="h-5 w-5 text-orange-600" />
                       </div>
                       <CardTitle className="text-lg text-blue-600">2. Customize</CardTitle>
                     </div>
