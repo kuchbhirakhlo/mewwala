@@ -8,6 +8,7 @@ import { auth, doc, safeGetDoc, db, collection, query, where, safeGetDocs, getDo
 import { orderBy, limit } from "firebase/firestore"
 import { QrCode, Store, Users, BarChart3, ChevronUp, Clock, Building2 } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/components/language-context"
 
 const businessTypeIcons: Record<string, any> = {
   restaurant: Store,
@@ -42,6 +43,8 @@ const businessTypeLabels: Record<string, string> = {
 }
 
 export default function DashboardPage() {
+  const { language, t } = useLanguage()
+  const isHindi = language === 'hi'
   const [businessName, setBusinessName] = useState("")
   const [businessType, setBusinessType] = useState("restaurant")
   const [loading, setLoading] = useState(true)
@@ -187,14 +190,14 @@ export default function DashboardPage() {
             <Link href="/dashboard/menu/create" className="w-full md:w-auto">
               <Button className="bg-blue-500 hover:bg-blue-600 shadow-md w-full">
                 <Store className="mr-2 h-4 w-4" />
-                Create Catalog
+                {isHindi ? "कैटलॉग बनाएं" : "Create Catalog"}
               </Button>
             </Link>
           ) : (
             <Link href={`/dashboard/menu/edit/${menuId}`} className="w-full md:w-auto">
               <Button className="bg-blue-500 hover:bg-blue-600 shadow-md w-full">
                 <Store className="mr-2 h-4 w-4" />
-                Edit Catalog
+                {isHindi ? "कैटलॉग संपादित करें" : "Edit Catalog"}
               </Button>
             </Link>
           )}
@@ -272,9 +275,9 @@ export default function DashboardPage() {
         <TabsContent value="overview" className="space-y-6">
           <Card className="border-orange-200 bg-white shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-              <CardTitle>Get Started with MenuWala</CardTitle>
+              <CardTitle>{isHindi ? "MenuWala के साथ शुरू करें" : "Get Started with MenuWala"}</CardTitle>
               <CardDescription className="text-blue-100">
-                Follow these steps to create your digital catalog and QR code
+                {isHindi ? "अपना डिजिटल कैटलॉग और QR कोड बनाने के लिए इन चरणों का पालन करें" : "Follow these steps to create your digital catalog and QR code"}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 md:p-6">
@@ -286,21 +289,21 @@ export default function DashboardPage() {
                       <div className="bg-blue-100 p-2 rounded-full">
                         <Store className="h-5 w-5 text-blue-600" />
                       </div>
-                      <CardTitle className="text-lg text-blue-600">1. Create Catalog</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">1. {isHindi ? "कैटलॉग बनाएं" : "Create Catalog"}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-blue-600 mb-4">Add categories and items to your digital catalog</p>
+                    <p className="text-sm text-blue-600 mb-4">{isHindi ? "अपने डिजिटल कैटलॉग में श्रेणियां और आइटम जोड़ें" : "Add categories and items to your digital catalog"}</p>
                     {!hasMenu ? (
                       <Link href="/dashboard/menu/create" className="block">
                         <Button variant="outline" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
-                          Create Menu
+                          {isHindi ? "मेनू बनाएं" : "Create Menu"}
                         </Button>
                       </Link>
                     ) : (
                       <Link href={`/dashboard/menu/edit/${menuId}`} className="block">
                         <Button variant="outline" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
-                          Edit Menu
+                          {isHindi ? "मेनू संपादित करें" : "Edit Menu"}
                         </Button>
                       </Link>
                     )}
@@ -314,19 +317,19 @@ export default function DashboardPage() {
                       <div className="bg-orange-100 p-2 rounded-full">
                         <Store className="h-5 w-5 text-orange-600" />
                       </div>
-                      <CardTitle className="text-lg text-blue-600">2. Customize</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">2. {isHindi ? "कस्टमाइज़ करें" : "Customize"}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-blue-600 mb-4">Personalize your catalog with categories and items</p>
+                    <p className="text-sm text-blue-600 mb-4">{isHindi ? "श्रेणियों और आइटम के साथ अपने कैटलॉग को व्यक्तिगत बनाएं" : "Personalize your catalog with categories and items"}</p>
                     {!hasMenu ? (
                       <Button variant="outline" className="w-full border-orange-300 text-orange-600 hover:bg-orange-50" disabled>
-                        Create Menu First
+                        {isHindi ? "पहले मेनू बनाएं" : "Create Menu First"}
                       </Button>
                     ) : (
                       <Link href={`/dashboard/menu/edit/${menuId}`} className="block">
                         <Button variant="outline" className="w-full border-orange-300 text-orange-600 hover:bg-orange-50">
-                          Customize Menu
+                          {isHindi ? "कस्टमाइज़ मेनू" : "Customize Menu"}
                         </Button>
                       </Link>
                     )}
@@ -340,19 +343,19 @@ export default function DashboardPage() {
                       <div className="bg-green-100 p-2 rounded-full">
                         <QrCode className="h-5 w-5 text-green-600" />
                       </div>
-                      <CardTitle className="text-lg text-blue-600">3. Share</CardTitle>
+                      <CardTitle className="text-lg text-blue-600">3. {isHindi ? "साझा करें" : "Share"}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 relative z-10">
-                    <p className="text-sm text-blue-600 mb-4">Generate QR code for customers to scan</p>
+                    <p className="text-sm text-blue-600 mb-4">{isHindi ? "ग्राहकों के स्कैन करने के लिए QR कोड बनाएं" : "Generate QR code for customers to scan"}</p>
                     {!hasMenu ? (
                       <Button variant="outline" className="w-full border-green-300 text-green-600 hover:bg-green-50" disabled>
-                        Create Menu First
+                        {isHindi ? "पहले मेनू बनाएं" : "Create Menu First"}
                       </Button>
                     ) : (
                       <Link href={`/dashboard/qr-codes?menuId=${menuId}`} className="block">
                         <Button variant="outline" className="w-full border-green-300 text-green-600 hover:bg-green-50">
-                          Generate QR Code
+                          {isHindi ? "QR कोड बनाएं" : "Generate QR Code"}
                         </Button>
                       </Link>
                     )}
