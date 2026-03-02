@@ -9,7 +9,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Menuwala - Free Online QR Menu Maker | Digital Business Menus",
+  title: "Menuwala - Free Online QR Menu Maker | E-Commerce Menus",
   description: "Create stunning digital menus and QR codes for free. Online QR menu maker for businesses, cafes, and food businesses. Generate QR codes, receive WhatsApp orders, and boost your business.",
   keywords: [
     // Core Digital Menu Keywords
@@ -158,6 +158,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google Analytics */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-P7HFDR4WMT"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-P7HFDR4WMT');
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <LanguageProvider>
