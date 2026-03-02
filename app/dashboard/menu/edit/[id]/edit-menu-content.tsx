@@ -95,11 +95,12 @@ export function EditMenuContent({ id }: { id: string }) {
         setWhatsappNumber(menuData.whatsappNumber || "")
 
         // Convert the categories to our format with IDs
+        // Use a stable ID based on index to avoid regenerating IDs on every load
         const formattedCategories: Category[] = menuData.categories.map((category, categoryIndex) => ({
-          id: `category-${categoryIndex}-${Date.now()}`,
+          id: `category-${categoryIndex}`,
           name: category.name,
           items: category.items.map((item, itemIndex) => ({
-            id: `item-${categoryIndex}-${itemIndex}-${Date.now()}`,
+            id: `item-${categoryIndex}-${itemIndex}`,
             name: item.name,
             description: item.description || "",
             price: item.price.toString(),
@@ -109,7 +110,7 @@ export function EditMenuContent({ id }: { id: string }) {
 
         setCategories(formattedCategories)
 
-        // Initialize uploadedImages from existing data
+        // Initialize uploadedImages from existing data using stable IDs
         const initialUploadedImages: Record<string, string> = {}
         formattedCategories.forEach(category => {
           category.items.forEach(item => {
@@ -135,10 +136,11 @@ export function EditMenuContent({ id }: { id: string }) {
   }, [id, router])
 
   const addCategory = () => {
+    const newCategoryId = `new-category-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     setCategories([
       ...categories,
       {
-        id: "category-" + Date.now(),
+        id: newCategoryId,
         name: "New Category",
         items: [],
       },
@@ -154,22 +156,24 @@ export function EditMenuContent({ id }: { id: string }) {
   }
 
   const addMenuItem = (categoryId: string) => {
+    // Generate a unique ID that's stable for this session
+    const newItemId = `new-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     setCategories(
       categories.map((category) =>
         category.id === categoryId
           ? {
-            ...category,
-            items: [
-              ...category.items,
-              {
-                id: "item-" + Date.now(),
-                name: "New Item",
-                description: "Description",
-                price: "0.00",
-                image: "",
-              },
-            ],
-          }
+              ...category,
+              items: [
+                ...category.items,
+                {
+                  id: newItemId,
+                  name: "New Item",
+                  description: "Description",
+                  price: "0.00",
+                  image: "",
+                },
+              ],
+            }
           : category,
       ),
     )
@@ -204,9 +208,25 @@ export function EditMenuContent({ id }: { id: string }) {
   const handleImageUpload = async (categoryId: string, itemId: string, file: File) => {
     try {
       setSelectedFiles(prev => ({ ...prev, [itemId]: file.name }))
+      
+      // Upload to Cloudinary first
       const imageUrl = await uploadImage(file)
-      updateMenuItem(categoryId, itemId, "image", imageUrl)
+      
+      // Store directly in the categories state as well for immediate access
+      setCategories(prev => prev.map(cat => 
+        cat.id === categoryId 
+          ? {
+              ...cat,
+              items: cat.items.map(item => 
+                item.id === itemId ? { ...item, image: imageUrl } : item
+              )
+            }
+          : cat
+      ))
+      
+      // Also store in uploadedImages for the save function
       setUploadedImages(prev => ({ ...prev, [itemId]: imageUrl }))
+      
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear filename after successful upload
       toast({
         title: "Success",
@@ -217,7 +237,7 @@ export function EditMenuContent({ id }: { id: string }) {
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear on error
       toast({
         title: "Error",
-        description: "Failed to upload image",
+        description: "Failed to upload image. Please try again.",
         variant: "destructive",
       })
     }

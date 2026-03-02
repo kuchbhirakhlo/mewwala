@@ -143,9 +143,25 @@ export default function CreateMenuPage() {
   const handleImageUpload = async (categoryId: string, itemId: string, file: File) => {
     try {
       setSelectedFiles(prev => ({ ...prev, [itemId]: file.name }))
+      
+      // Upload to Cloudinary first
       const imageUrl = await uploadImage(file)
-      updateMenuItem(categoryId, itemId, "image", imageUrl)
+      
+      // Store directly in the categories state as well for immediate access
+      setCategories(prev => prev.map(cat => 
+        cat.id === categoryId 
+          ? {
+              ...cat,
+              items: cat.items.map(item => 
+                item.id === itemId ? { ...item, image: imageUrl } : item
+              )
+            }
+          : cat
+      ))
+      
+      // Also store in uploadedImages for the save function
       setUploadedImages(prev => ({ ...prev, [itemId]: imageUrl }))
+      
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear filename after successful upload
       toast({
         title: "Success",
@@ -156,7 +172,7 @@ export default function CreateMenuPage() {
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear on error
       toast({
         title: "Error",
-        description: "Failed to upload image",
+        description: "Failed to upload image. Please try again.",
         variant: "destructive",
       })
     }

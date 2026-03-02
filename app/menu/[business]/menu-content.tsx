@@ -633,21 +633,17 @@ export function MenuContent({ restaurant: business }: { restaurant: string }) {
                     <div className="flex flex-col">
                       {/* Item Image */}
                       <div className="relative h-32 bg-gradient-to-br from-orange-200 to-red-200 flex items-center justify-center overflow-hidden md:h-48 md:w-48 md:flex-shrink-0">
-                        {item?.image ? (
-                          <Image
+                        {item?.image && item.image.trim() !== "" ? (
+                          <img
                             src={item.image}
                             alt={item.name}
                             className="w-full h-full object-cover"
-                            width={30}
-                            height={10}
                           />
                         ) : (
-                          <Image
+                          <img
                             src="/logo.png"
-                            alt=" Image"
+                            alt="Placeholder Image"
                             className="w-24 h-24 text-gray-400 opacity-50 md:w-16 md:h-16"
-                            width={50}
-                            height={20}
                           />
                         )}
                         
