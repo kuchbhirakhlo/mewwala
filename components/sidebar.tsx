@@ -70,6 +70,70 @@ export function Sidebar() {
     fetchMenu()
   }, [user])
 
+  // Refresh menu state when page becomes visible (e.g., returning from create/edit page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Refresh menu data when page becomes visible again
+        const refreshMenuState = async () => {
+          try {
+            const currentUser = auth.currentUser
+            if (currentUser) {
+              const menusQuery = query(collection(db, "menus"), where("restaurantId", "==", currentUser.uid))
+              const menusSnapshot = await safeGetDocs(menusQuery)
+              
+              if (menusSnapshot.docs.length > 0) {
+                setHasMenu(true)
+                setMenuId(menusSnapshot.docs[0].id)
+              } else {
+                setHasMenu(false)
+                setMenuId(null)
+              }
+            }
+          } catch (error) {
+            console.error("Error refreshing menu state:", error)
+          }
+        }
+        
+        refreshMenuState()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    
+    // Also refresh on window focus
+    const handleFocus = () => {
+      const refreshMenuState = async () => {
+        try {
+          const currentUser = auth.currentUser
+          if (currentUser) {
+            const menusQuery = query(collection(db, "menus"), where("restaurantId", "==", currentUser.uid))
+            const menusSnapshot = await safeGetDocs(menusQuery)
+            
+            if (menusSnapshot.docs.length > 0) {
+              setHasMenu(true)
+              setMenuId(menusSnapshot.docs[0].id)
+            } else {
+              setHasMenu(false)
+              setMenuId(null)
+            }
+          }
+        } catch (error) {
+          console.error("Error refreshing menu state:", error)
+        }
+      }
+      
+      refreshMenuState()
+    }
+    
+    window.addEventListener("focus", handleFocus)
+    
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, [])
+
   const handleSignOut = async () => {
     try {
       await safeSignOut(auth)

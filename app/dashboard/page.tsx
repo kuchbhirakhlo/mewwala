@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -44,6 +45,7 @@ const businessTypeLabels: Record<string, string> = {
 
 export default function DashboardPage() {
   const { language, t } = useLanguage()
+  const router = useRouter()
   const isHindi = language === 'hi'
   const [businessName, setBusinessName] = useState("")
   const [businessType, setBusinessType] = useState("restaurant")
@@ -103,6 +105,30 @@ export default function DashboardPage() {
 
     fetchData()
   }, [])
+
+  // Refresh menu state when page becomes visible (e.g., returning from create/edit page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Force a full page refresh to get latest data
+        router.refresh()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    
+    // Also refresh on window focus
+    const handleFocus = () => {
+      router.refresh()
+    }
+    
+    window.addEventListener("focus", handleFocus)
+    
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, [router])
 
   const fetchAnalytics = async (userId: string, menuId: string) => {
     try {

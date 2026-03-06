@@ -207,10 +207,12 @@ export function EditMenuContent({ id }: { id: string }) {
 
   const handleImageUpload = async (categoryId: string, itemId: string, file: File) => {
     try {
+      console.log("Starting image upload for item:", itemId, "file:", file.name, "size:", file.size)
       setSelectedFiles(prev => ({ ...prev, [itemId]: file.name }))
       
       // Upload to Cloudinary first
       const imageUrl = await uploadImage(file)
+      console.log("Image uploaded successfully, URL:", imageUrl)
       
       // Store directly in the categories state as well for immediate access
       setCategories(prev => prev.map(cat => 
@@ -226,18 +228,19 @@ export function EditMenuContent({ id }: { id: string }) {
       
       // Also store in uploadedImages for the save function
       setUploadedImages(prev => ({ ...prev, [itemId]: imageUrl }))
+      console.log("Image URL stored in uploadedImages for item:", itemId)
       
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear filename after successful upload
       toast({
         title: "Success",
         description: "Image uploaded successfully",
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error)
       setSelectedFiles(prev => ({ ...prev, [itemId]: "" })) // Clear on error
       toast({
         title: "Error",
-        description: "Failed to upload image. Please try again.",
+        description: "Failed to upload image. Please try again. " + (error.message || ""),
         variant: "destructive",
       })
     }
@@ -393,7 +396,12 @@ export function EditMenuContent({ id }: { id: string }) {
                     <Label htmlFor={`item-image-${item.id}`}>Image</Label>
                     <div className="flex items-center gap-2">
                       {(item.image || uploadedImages[item.id]) && (
-                        <img src={uploadedImages[item.id] || item.image} alt={item.name} className="w-10 h-10 object-cover rounded" />
+                        <img 
+                          src={uploadedImages[item.id] || item.image} 
+                          alt={item.name} 
+                          className="w-10 h-10 object-cover rounded" 
+                          key={`img-${item.id}`}
+                        />
                       )}
                       <label htmlFor={`file-${item.id}`} className="cursor-pointer flex items-center gap-2">
                         <Image className="h-6 w-6 text-gray-500 hover:text-gray-700" />
